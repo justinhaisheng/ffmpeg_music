@@ -2,7 +2,6 @@ package com.aispeech.music.activity;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.aispeech.music.R;
 import com.hjq.permissions.OnPermission;
@@ -30,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Example of a call to a native method
-        TextView tv = findViewById(R.id.sample_text);
+
         hasPermissions();
     }
 
