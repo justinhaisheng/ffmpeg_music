@@ -18,6 +18,7 @@ class HsFFmpeg {
 public:
     char* url = NULL;
     HsCalljava *calljava = NULL;
+    AVFormatContext* pFormatContext = NULL;
     pthread_t decodeThread;
     HsAudio *audio = NULL;
 public:

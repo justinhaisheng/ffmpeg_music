@@ -4,12 +4,12 @@
 
 #include "HsCalljava.h"
 
-HsCalljava::HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject *obj) {
+HsCalljava::HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj) {
     this->javaVm = javaVM;
     this->jniEnv = env;
-    this->jobj = env->NewGlobalRef(*obj);
+    this->jobj = env->NewGlobalRef(obj);
 
-    jclass jclz = env->GetObjectClass(*obj);
+    jclass jclz = env->GetObjectClass(obj);
     if (!jclz){
         if (LOG_DEBUG){
             LOGE("get jclass wrong");
@@ -31,8 +31,14 @@ void HsCalljava::onCallPrepare(int thread_type) {
         return;
     }
     if (thread_type == MAIN_THREAD){
+        if (LOG_DEBUG){
+            LOGD("onCallPrepare MAIN_THREAD");
+        }
         this->jniEnv->CallVoidMethod(this->jobj,this->jmid_prepare);
     }else{
+        if (LOG_DEBUG){
+            LOGD("onCallPrepare CHILD_THREAD");
+        }
         JNIEnv *jniEnv2;
         if (this->javaVm->AttachCurrentThread(&jniEnv2,0)!=JNI_OK){
             if (LOG_DEBUG){

@@ -39,7 +39,7 @@ JNIEXPORT jstring JNICALL Java_com_aispeech_player_Demo_stringFromJNI
 
 HsFFmpeg* ffmpeg = NULL;
 HsCalljava* calljava = NULL;
-_JavaVM *javaVM = NULL;
+_JavaVM* javaVM = NULL;
 
 extern "C"
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1prepare
@@ -48,7 +48,7 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1prepare
     const char* source = env->GetStringUTFChars(jsource,0);
     if (!ffmpeg){
         if(!calljava){
-            calljava = new HsCalljava(javaVM,env,&instance);
+            calljava = new HsCalljava(javaVM,env,instance);
         }
         ffmpeg = new HsFFmpeg(calljava,source);
     }
@@ -59,6 +59,15 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1prepare
 extern "C"
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1start
         (JNIEnv *, jobject){
+    if (!ffmpeg){
+        if (LOG_DEBUG){
+            LOGE("ffmpeg wrong");
+        }
+        return ;
+    }
+
+    ffmpeg->start();
+
 
 }
 

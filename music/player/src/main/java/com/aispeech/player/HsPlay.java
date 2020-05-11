@@ -50,6 +50,20 @@ public class HsPlay {
         }).start();
     }
 
+    public void start(){
+        if (TextUtils.isEmpty(mSource)){
+            Log.d(TAG,"prepare");
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                n_start();
+            }
+        }).start();
+    }
+
+
     /*
     *C++ 回调 java的方法
     *@author luhaisheng
@@ -60,8 +74,8 @@ public class HsPlay {
             mHsPrepareListener.prepare();
         }
     }
-    public native void n_prepare(String source);
-    public native void n_start();
+    private native void n_prepare(String source);
+    private native void n_start();
 
 
 

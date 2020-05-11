@@ -26,9 +26,47 @@ void HsFFmpeg::prepare() {
     pthread_create(&decodeThread,NULL,ffmpegthread,this);
 }
 
+//解码
+void HsFFmpeg::start() {
+    if (!this->audio){
+        if(LOG_DEBUG){
+            LOGE("audio is null");
+            return;
+        }
+    }
+
+    int count = 0;
+    while(1){
+        AVPacket *avPacket = av_packet_alloc();
+
+        //获取每一帧数据
+        if (av_read_frame(this->pFormatContext,avPacket) == 0){
+            if(avPacket->stream_index == this->audio->streamIndex){//音频数据
+                count++;
+                if(LOG_DEBUG)
+                {
+                    LOGI("解码第 %d 帧", count);
+                }
+            }
+            av_packet_free(&avPacket);
+            av_free(avPacket);
+        }else{
+            if(LOG_DEBUG)
+            {
+                LOGE("decode finished");
+            }
+            av_packet_free(&avPacket);
+            av_free(avPacket);
+            break;
+        }
+    }
+}
+
 //线程需要执行的函数
 void HsFFmpeg::decodeFFmpegThread() {
-    LOGD("decodeFFmpegThread %s",this->url);
+    if (LOG_DEBUG){
+        LOGD("decodeFFmpegThread %s",this->url);
+    }
     //1、注册解码器并初始化网络
     av_register_all();
     avformat_network_init();
@@ -47,6 +85,7 @@ void HsFFmpeg::decodeFFmpegThread() {
         }
         return;
     }
+    this->pFormatContext = pFormatCtx;
     //4、获取音频流
     for (int i = 0; i < pFormatCtx->nb_streams; ++i) {
          if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO){//得到音频流

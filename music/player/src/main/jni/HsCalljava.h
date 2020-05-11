@@ -21,7 +21,7 @@ public:
     jmethodID  jmid_prepare;
 
 public:
-    HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject *obj);
+    HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj);
     ~HsCalljava();
 
     void onCallPrepare(int thread_type);

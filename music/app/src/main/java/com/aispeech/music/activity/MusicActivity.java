@@ -26,6 +26,7 @@ public class MusicActivity extends AppCompatActivity {
             @Override
             public void prepare() {
                 Log.d(HsPlay.TAG,"prepare");
+                mHsPlay.start();
             }
         });
         mHsPlay.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
