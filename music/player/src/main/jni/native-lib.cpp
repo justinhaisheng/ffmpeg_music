@@ -1,8 +1,11 @@
 #include <jni.h>
 #include <string>
 
-#include "com_aispeech_player_Demo.h"
+
 #include "AndroidLog.h"
+#include "HsFFmpeg.h"
+#include "HsCalljava.h"
+
 extern "C"
 {
 #include <libavformat/avformat.h>
@@ -32,4 +35,42 @@ JNIEXPORT jstring JNICALL Java_com_aispeech_player_Demo_stringFromJNI
     }
     std::string hello = "hello from jni";
     return env->NewStringUTF(hello.c_str());
+}
+
+HsFFmpeg* ffmpeg = NULL;
+HsCalljava* calljava = NULL;
+_JavaVM *javaVM = NULL;
+
+extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1prepare
+        (JNIEnv *env, jobject instance, jstring jsource){
+
+    const char* source = env->GetStringUTFChars(jsource,0);
+    if (!ffmpeg){
+        if(!calljava){
+            calljava = new HsCalljava(javaVM,env,&instance);
+        }
+        ffmpeg = new HsFFmpeg(calljava,source);
+    }
+    ffmpeg->prepare();
+    env->ReleaseStringUTFChars(jsource,source);
+}
+
+extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1start
+        (JNIEnv *, jobject){
+
+}
+
+
+extern "C"
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){
+    jint result = -1;
+    javaVM = vm;
+    JNIEnv *env;
+    if(vm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK)
+    {
+        return result;
+    }
+    return JNI_VERSION_1_4;
 }
