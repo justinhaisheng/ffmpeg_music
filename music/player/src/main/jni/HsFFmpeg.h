@@ -18,11 +18,12 @@ class HsFFmpeg {
 public:
     char* url = NULL;
     HsCalljava *calljava = NULL;
+    HsPlaystatus* playstatus = NULL;
     AVFormatContext* pFormatContext = NULL;
     pthread_t decodeThread;
     HsAudio *audio = NULL;
 public:
-    HsFFmpeg(HsCalljava* calljava, const char* url);
+    HsFFmpeg(HsCalljava* calljava,HsPlaystatus* playstatus, const char* url);
     ~HsFFmpeg();
 
     void prepare();

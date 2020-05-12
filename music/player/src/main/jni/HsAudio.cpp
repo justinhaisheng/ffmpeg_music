@@ -4,8 +4,9 @@
 
 #include "HsAudio.h"
 
-HsAudio::HsAudio() {
-
+HsAudio::HsAudio(HsPlaystatus* playstatus) {
+    this->playstatus = playstatus;
+    queue = new HsQueue(this->playstatus);
 }
 
 HsAudio::~HsAudio() {
