@@ -12,3 +12,17 @@ HsAudio::HsAudio(HsPlaystatus* playstatus) {
 HsAudio::~HsAudio() {
 
 }
+
+void* decord_play(void* data){
+    HsAudio* audio = static_cast<HsAudio *>(data);
+    audio->resampleAudio();
+    pthread_exit(&audio->thread_play);
+}
+
+void HsAudio::play() {
+    pthread_create(&thread_play,NULL,decord_play,this);
+}
+
+int HsAudio::resampleAudio() {
+
+}

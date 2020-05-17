@@ -22,9 +22,13 @@ public:
     HsQueue* queue = NULL;
     HsPlaystatus* playstatus = NULL;
 
+    pthread_t thread_play;
 public:
     HsAudio(HsPlaystatus* playstatus);
     ~HsAudio();
+
+    void play();
+    int resampleAudio();
 };
 
 

@@ -36,6 +36,9 @@ void HsFFmpeg::start() {
         }
     }
 
+    this->audio->play();
+
+
     int count = 0;
     while(1){
         AVPacket *avPacket = av_packet_alloc();
@@ -64,6 +67,7 @@ void HsFFmpeg::start() {
         }
     }
 
+    /*
     while(this->audio->queue->getQueueSize()>0){
         AVPacket* packet = av_packet_alloc();
         this->audio->queue->getPacket(packet);
@@ -71,6 +75,7 @@ void HsFFmpeg::start() {
         av_free(packet);
         packet = NULL;
     }
+    */
     if(LOG_DEBUG)
     {
         LOGD("解码完成");
