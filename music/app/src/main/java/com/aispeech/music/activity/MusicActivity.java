@@ -29,7 +29,8 @@ public class MusicActivity extends AppCompatActivity {
                 mHsPlay.start();
             }
         });
-        mHsPlay.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+        //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3
+        mHsPlay.setSource("/sdcard/1.mp3");
     }
 
     public static void jumpMusicActivity(Context context){

@@ -41,7 +41,7 @@ int HsQueue::getPacket(AVPacket *packet) {
             avPacket = NULL;
             if(LOG_DEBUG)
             {
-                LOGD("从队列里面取出一个AVpacket，还剩下 %d 个", queuePacket.size());
+                LOGI("从队列里面取出一个AVpacket，还剩下 %d 个", queuePacket.size());
             }
             break;
         }else{

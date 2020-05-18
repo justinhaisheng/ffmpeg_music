@@ -49,7 +49,7 @@ void HsFFmpeg::start() {
                 count++;
                 if(LOG_DEBUG)
                 {
-                    LOGI("解码第 %d 帧", count);
+                    LOGD("解封装第 %d 帧", count);
                 }
                 this->audio->queue->putPacket(avPacket);
             }else{
@@ -57,12 +57,21 @@ void HsFFmpeg::start() {
                 av_free(avPacket);
             }
         }else{
-            if(LOG_DEBUG)
-            {
-                LOGE("decode finished");
-            }
+
             av_packet_free(&avPacket);
             av_free(avPacket);
+            while (playstatus && !playstatus->exit){
+                if (this->audio->queue->getQueueSize() > 0){
+                    continue;
+                }else{
+                    playstatus->exit = true;
+                    if(LOG_DEBUG)
+                    {
+                        LOGE("decode finished");
+                    }
+                    break;
+                }
+            }
             break;
         }
     }

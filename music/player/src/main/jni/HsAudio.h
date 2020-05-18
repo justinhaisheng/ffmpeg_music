@@ -11,6 +11,7 @@
 extern "C"
 {
 #include "libavcodec/avcodec.h"
+#include "libswresample/swresample.h"
 };
 
 class HsAudio {
@@ -23,6 +24,8 @@ public:
     HsPlaystatus* playstatus = NULL;
 
     pthread_t thread_play;
+    uint8_t* resample_data = NULL;//重采样后的数据
+    size_t   resample_data_size = 0;
 public:
     HsAudio(HsPlaystatus* playstatus);
     ~HsAudio();
