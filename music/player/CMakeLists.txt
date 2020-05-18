@@ -91,6 +91,8 @@ set_target_properties( swscale-4
 target_link_libraries( # Specifies the target library.
                        native-lib
 
+                       OpenSLES
+
                        avcodec-57
                        avdevice-57
                        avfilter-6

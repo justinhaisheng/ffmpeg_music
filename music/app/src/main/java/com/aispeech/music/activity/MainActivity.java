@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
             "android.permission.ACCESS_NETWORK_STATE",
             "android.permission.INTERNET",
             "android.permission.ACCESS_WIFI_STATE",
+            "android.permission.MODIFY_AUDIO_SETTINGS"
     };
 
     private static final String TAG = MainActivity.class.getSimpleName();
