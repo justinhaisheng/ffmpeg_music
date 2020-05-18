@@ -51,4 +51,14 @@ public class MusicActivity extends AppCompatActivity {
     public void begin(View view) {
         mHsPlay.prepare();
     }
+
+    public void resume(View view){
+        mHsPlay.resume();
+    }
+
+    public void pause(View view){
+        mHsPlay.pause();
+    }
+
+
 }

@@ -23,6 +23,22 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1prepare
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1start
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_aispeech_player_HsPlay
+ * Method:    n_resume
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1resume
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_aispeech_player_HsPlay
+ * Method:    n_pause
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1pause
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

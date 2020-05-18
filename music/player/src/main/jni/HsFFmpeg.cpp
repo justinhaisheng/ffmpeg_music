@@ -157,3 +157,11 @@ void HsFFmpeg::decodeFFmpegThread() {
     //回调java方法
     this->calljava->onCallPrepare(CHILD_THREAD);
 }
+
+void HsFFmpeg::resume() {
+    this->audio->resume();
+}
+
+void HsFFmpeg::pause() {
+    this->audio->pause();
+}

@@ -26,6 +26,8 @@ public:
     HsFFmpeg(HsCalljava* calljava,HsPlaystatus* playstatus, const char* url);
     ~HsFFmpeg();
 
+    void resume();
+    void pause();
     void prepare();
     void start();
     void decodeFFmpegThread();

@@ -52,6 +52,8 @@ public:
     SLuint32 getCurrentSampleRateForOpensles(int sample_rate);
     void initOpenSLES();
     void play();
+    void pause();
+    void resume();
     int resampleAudio();
 };
 

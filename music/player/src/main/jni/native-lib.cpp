@@ -73,6 +73,22 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1start
 
 }
 
+extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1resume
+        (JNIEnv *env, jobject instance){
+    if(ffmpeg){
+        ffmpeg->resume();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1pause
+        (JNIEnv *env, jobject instance){
+    if(ffmpeg){
+        ffmpeg->pause();
+    }
+}
+
 
 extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){

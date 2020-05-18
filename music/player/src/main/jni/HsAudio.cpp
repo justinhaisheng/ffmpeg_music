@@ -288,3 +288,15 @@ SLuint32 HsAudio::getCurrentSampleRateForOpensles(int sample_rate) {
     }
     return rate;
 }
+
+void HsAudio::resume() {
+    if (pcmPlayerPlay){
+        (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PLAYING);
+    }
+}
+
+void HsAudio::pause() {
+    if (pcmPlayerPlay){
+        (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PAUSED);
+    }
+}
