@@ -6,4 +6,6 @@
 
 HsPlaystatus::HsPlaystatus() {
     exit = false;
+    load = true;
+
 }

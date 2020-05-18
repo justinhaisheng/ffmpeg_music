@@ -4,8 +4,9 @@
 
 #include "HsAudio.h"
 
-HsAudio::HsAudio(HsPlaystatus* playstatus,AVCodecParameters *codecpar,int streamIndex) {
+HsAudio::HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters *codecpar,int streamIndex) {
     this->playstatus = playstatus;
+    this->calljava = calljava;
     this->codecpar = codecpar;
     this->streamIndex = streamIndex;
     this->sample_rate = this->codecpar->sample_rate;
@@ -115,6 +116,21 @@ void HsAudio::initOpenSLES() {
 
 int HsAudio::resampleAudio() {
     while(this->playstatus && !this->playstatus->exit){
+
+        if (this->queue->getQueueSize() == 0){//没有数据
+            if (!this->playstatus->load){
+                this->playstatus->load = true;
+                this->calljava->onCallLoading(this->playstatus->load,CHILD_THREAD);
+            }
+            continue;
+        }else{
+            if (this->playstatus->load){
+                this->playstatus->load = false;
+                this->calljava->onCallLoading(this->playstatus->load,CHILD_THREAD);
+            }
+        }
+
+
         AVPacket* avPacket = av_packet_alloc();
         if(this->queue->getPacket(avPacket)!=0){
             if (LOG_DEBUG){

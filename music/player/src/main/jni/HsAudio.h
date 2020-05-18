@@ -7,6 +7,7 @@
 
 #include "HsPlaystatus.h"
 #include "HsQueue.h"
+#include "HsCalljava.h"
 
 extern "C"
 {
@@ -25,6 +26,7 @@ public:
 
     HsQueue* queue = NULL;
     HsPlaystatus* playstatus = NULL;
+    HsCalljava* calljava = NULL;
 
     pthread_t thread_play;
     uint8_t* resample_data = NULL;//重采样后的数据
@@ -44,7 +46,7 @@ public:
     //缓冲器队列接口
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 public:
-    HsAudio(HsPlaystatus* playstatus,AVCodecParameters *codecpar,int streamIndex);
+    HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters *codecpar,int streamIndex);
     ~HsAudio();
 
     SLuint32 getCurrentSampleRateForOpensles(int sample_rate);

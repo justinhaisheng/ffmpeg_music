@@ -19,12 +19,14 @@ public:
     jobject jobj = NULL;
 
     jmethodID  jmid_prepare;
+    jmethodID  jmid_load;
 
 public:
     HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj);
     ~HsCalljava();
 
     void onCallPrepare(int thread_type);
+    void onCallLoading(bool load,int thread_type);
 };
 
 

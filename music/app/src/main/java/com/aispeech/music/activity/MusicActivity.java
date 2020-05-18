@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.aispeech.listener.HsLoadingListener;
 import com.aispeech.listener.HsPrepareListener;
 import com.aispeech.music.R;
 import com.aispeech.player.HsPlay;
@@ -27,6 +28,16 @@ public class MusicActivity extends AppCompatActivity {
             public void prepare() {
                 Log.d(HsPlay.TAG,"prepare");
                 mHsPlay.start();
+            }
+        });
+        mHsPlay.setHsLoadListener(new HsLoadingListener() {
+            @Override
+            public void loading(boolean load) {
+                if (load){
+                    Log.d(HsPlay.TAG,"加载中...");
+                }else{
+                    Log.d(HsPlay.TAG,"播放中...");
+                }
             }
         });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3

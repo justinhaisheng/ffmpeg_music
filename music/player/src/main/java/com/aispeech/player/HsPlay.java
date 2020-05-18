@@ -3,6 +3,7 @@ package com.aispeech.player;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.aispeech.listener.HsLoadingListener;
 import com.aispeech.listener.HsPrepareListener;
 
 /**
@@ -37,11 +38,18 @@ public class HsPlay {
         this.mHsPrepareListener = hsPrepareListener;
     }
 
+    HsLoadingListener mHsLoadListener;
+    public void setHsLoadListener(HsLoadingListener hsLoadListener){
+        this.mHsLoadListener = hsLoadListener;
+    }
+
+
     public void prepare(){
         if (TextUtils.isEmpty(mSource)){
-            Log.d(TAG,"prepare");
+            Log.e(TAG,"prepare mSource == NULL");
             return;
         }
+        onCallLoading(true);//正在加载
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -52,7 +60,7 @@ public class HsPlay {
 
     public void start(){
         if (TextUtils.isEmpty(mSource)){
-            Log.d(TAG,"prepare");
+            Log.e(TAG,"start mSource == NULL");
             return;
         }
         new Thread(new Runnable() {
@@ -69,11 +77,24 @@ public class HsPlay {
     *@author luhaisheng
     *@time 2020/5/11 12:15
     */
-    public void onCallPrepare(){
+    private void onCallPrepare(){
         if (mHsPrepareListener!=null){
             mHsPrepareListener.prepare();
         }
     }
+
+    /*
+     *C++ 回调 java的方法
+     *@author luhaisheng
+     *@time 2020/5/11 12:15
+     */
+    private void onCallLoading(boolean load){
+        if (mHsLoadListener!=null){
+            mHsLoadListener.loading(load);
+        }
+    }
+
+
     private native void n_prepare(String source);
     private native void n_start();
 

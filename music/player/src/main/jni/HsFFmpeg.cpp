@@ -119,7 +119,7 @@ void HsFFmpeg::decodeFFmpegThread() {
     for (int i = 0; i < pFormatCtx->nb_streams; ++i) {
          if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO){//得到音频流
              if (!this->audio){
-                 this->audio = new HsAudio(this->playstatus,pFormatCtx->streams[i]->codecpar,i);
+                 this->audio = new HsAudio(this->playstatus,this->calljava,pFormatCtx->streams[i]->codecpar,i);
              }
          }
     }
