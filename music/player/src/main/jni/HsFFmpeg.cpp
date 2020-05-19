@@ -120,6 +120,8 @@ void HsFFmpeg::decodeFFmpegThread() {
          if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO){//得到音频流
              if (!this->audio){
                  this->audio = new HsAudio(this->playstatus,this->calljava,pFormatCtx->streams[i]->codecpar,i);
+                 this->audio->total_duration = pFormatCtx->duration / AV_TIME_BASE;
+                 this->audio->FRAME_TIME_BASE = pFormatCtx->streams[i]->time_base;
              }
          }
     }

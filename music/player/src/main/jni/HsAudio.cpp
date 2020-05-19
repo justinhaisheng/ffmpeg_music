@@ -10,6 +10,7 @@ HsAudio::HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters
     this->codecpar = codecpar;
     this->streamIndex = streamIndex;
     this->sample_rate = this->codecpar->sample_rate;
+
     queue = new HsQueue(this->playstatus);
     resample_data = static_cast<uint8_t *>(av_malloc(sample_rate * 2 * 2));//申请一秒的数据量大小
 }
@@ -222,8 +223,20 @@ int HsAudio::resampleAudio() {
         LOGI("resample_nb = %d,avFrame->nb_samples = %d",resample_nb,avFrame->nb_samples);
 
         int resample_data_size = resample_nb * avFrame->channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
+        //当前AVframe时间
+        this->play_frame_now_time = avFrame->pts * av_q2d(this->FRAME_TIME_BASE);
 
-        LOGI("重采样后的数据大小 %d",resample_data_size);
+        LOGI("重采样后的数据大小 %d,当前帧的时间 %ld",resample_data_size,play_frame_now_time);
+
+        if(this->play_clock > this->play_frame_now_time){
+            this->play_frame_now_time = this->play_clock;
+        }
+        this->play_clock = this->play_frame_now_time;
+        this->play_clock += resample_data_size / (double)(this->sample_rate * 2 * 2);//1秒的采样
+        if(this->play_clock - this->play_last_clock >= 0.5){//0.2秒回调一次
+            this->play_last_clock = this->play_clock;//记录audio->play_clock的时间
+            this->calljava->onCallTimeInfo(this->play_clock,this->total_duration,CHILD_THREAD);
+        }
 
         av_packet_free(&avPacket);
         av_free(avPacket);

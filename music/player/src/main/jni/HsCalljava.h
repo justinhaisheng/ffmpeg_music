@@ -20,13 +20,14 @@ public:
 
     jmethodID  jmid_prepare;
     jmethodID  jmid_load;
-
+    jmethodID  jmid_timeinfo;
 public:
     HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj);
     ~HsCalljava();
 
     void onCallPrepare(int thread_type);
     void onCallLoading(bool load,int thread_type);
+    void onCallTimeInfo(int current,int total,int thread_type);
 };
 
 
