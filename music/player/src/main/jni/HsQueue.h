@@ -32,7 +32,7 @@ public:
     int getPacket(AVPacket* packet);
 
     int getQueueSize();
-
+    void clearQueue();
 };
 
 

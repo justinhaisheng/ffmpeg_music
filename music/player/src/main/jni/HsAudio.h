@@ -20,8 +20,8 @@ extern "C"
 class HsAudio {
 public:
     int streamIndex = -1;
-    AVCodecContext *avCodecContext = NULL;
     AVCodecParameters *codecpar = NULL;
+    AVCodecContext *avCodecContext = NULL;
     int sample_rate = -1;
 
     HsQueue* queue = NULL;
@@ -60,6 +60,8 @@ public:
     void pause();
     void resume();
     int resampleAudio();
+    void stop();
+    void release();
 };
 
 

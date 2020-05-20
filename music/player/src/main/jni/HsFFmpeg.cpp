@@ -10,21 +10,29 @@ HsFFmpeg::HsFFmpeg(HsCalljava* calljava,HsPlaystatus* playstatus, const char* ur
     this->playstatus = playstatus;
     this->url = static_cast<char *>(malloc(sizeof(char) * strlen(url)));
     strcpy(this->url,url);
+    pthread_mutex_init(&decode_mutex,NULL);
+    decode_exit = false;
 }
 
 HsFFmpeg::~HsFFmpeg() {
-
+    free(url);
+    pthread_mutex_destroy(&decode_mutex);
+    if(pFormatContext){
+        avformat_close_input(&pFormatContext);
+        avformat_free_context(pFormatContext);
+        pFormatContext =NULL;
+    }
 }
 
 
 void* ffmpegthread(void* data){
     HsFFmpeg* hsFFmpeg = static_cast<HsFFmpeg *>(data);
     hsFFmpeg->decodeFFmpegThread();
-    pthread_exit(&hsFFmpeg->decodeThread);
+    pthread_exit(&hsFFmpeg->decode_thread);
 }
 
 void HsFFmpeg::prepare() {
-    pthread_create(&decodeThread,NULL,ffmpegthread,this);
+    pthread_create(&decode_thread,NULL,ffmpegthread,this);
 }
 
 //解码
@@ -32,6 +40,7 @@ void HsFFmpeg::start() {
     if (!this->audio){
         if(LOG_DEBUG){
             LOGE("audio is null");
+            decode_exit = true;
             return;
         }
     }
@@ -40,7 +49,7 @@ void HsFFmpeg::start() {
 
 
     int count = 0;
-    while(1){
+    while(playstatus != NULL && !playstatus->exit){
         AVPacket *avPacket = av_packet_alloc();
 
         //获取每一帧数据
@@ -89,10 +98,22 @@ void HsFFmpeg::start() {
     {
         LOGD("解码完成");
     }
+    decode_exit = true;
+}
+
+int interruptCallback(void* ctx){
+    HsFFmpeg* hsFFmpeg = static_cast<HsFFmpeg *>(ctx);
+    if(hsFFmpeg->playstatus->exit){
+        return AVERROR_EOF;
+    }
+    return 0;
 }
 
 //线程需要执行的函数
 void HsFFmpeg::decodeFFmpegThread() {
+
+    pthread_mutex_lock(&decode_mutex);
+
     if (LOG_DEBUG){
         LOGD("decodeFFmpegThread %s",this->url);
     }
@@ -101,10 +122,15 @@ void HsFFmpeg::decodeFFmpegThread() {
     avformat_network_init();
     //2、打开文件或网络流
     AVFormatContext *pFormatCtx = avformat_alloc_context();
+
+    pFormatCtx->interrupt_callback.callback = interruptCallback;
+    pFormatCtx->interrupt_callback.opaque = this;
     if (avformat_open_input(&pFormatCtx,this->url,NULL,NULL)!=0){
         if (LOG_DEBUG){
             LOGE("avformat_open_input error %s",this->url);
         }
+        this->decode_exit = true;
+        pthread_mutex_unlock(&decode_mutex);
         return;
     }
     //3、获取流信息
@@ -112,6 +138,8 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("avformat_find_stream_info error %s",this->url);
         }
+        this->decode_exit = true;
+        pthread_mutex_unlock(&decode_mutex);
         return;
     }
     this->pFormatContext = pFormatCtx;
@@ -131,6 +159,8 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("获取不到解码器");
         }
+        this->decode_exit = true;
+        pthread_mutex_unlock(&decode_mutex);
         return;
     }
     //6、利用解码器创建解码器上下文
@@ -139,6 +169,8 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("获取不到解码器上下文");
         }
+        this->decode_exit = true;
+        pthread_mutex_unlock(&decode_mutex);
         return;
     }
     this->audio->avCodecContext = codecContext;
@@ -146,6 +178,8 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("can not fill decodecctx");
         }
+        this->decode_exit = true;
+        pthread_mutex_unlock(&decode_mutex);
         return;
     }
     //7、    打开解码器
@@ -154,10 +188,13 @@ void HsFFmpeg::decodeFFmpegThread() {
         {
             LOGE("cant not open audio strames");
         }
+        this->decode_exit = true;
+        pthread_mutex_unlock(&decode_mutex);
         return;
     }
     //回调java方法
     this->calljava->onCallPrepare(CHILD_THREAD);
+    pthread_mutex_unlock(&decode_mutex);
 }
 
 void HsFFmpeg::resume() {
@@ -166,4 +203,49 @@ void HsFFmpeg::resume() {
 
 void HsFFmpeg::pause() {
     this->audio->pause();
+}
+
+void HsFFmpeg::release() {
+    if(playstatus->exit){
+        if (LOG_DEBUG){
+            LOGE("no playing");
+        }
+        return;
+    }
+    if (LOG_DEBUG){
+        LOGD("开始释放ffmpeg");
+    }
+    playstatus->exit = true;
+
+    pthread_mutex_lock(&decode_mutex);
+    int sleepCount = 0;
+    while(!decode_exit){//等待解码的线程退出
+        if(sleepCount > 1000)
+        {
+            decode_exit = true;
+        }else{
+            if(LOG_DEBUG)
+            {
+                LOGE("wait ffmpeg  exit %d", sleepCount);
+            }
+            sleepCount++;
+            av_usleep(1000 * 10);//暂停10毫秒
+        }
+    }
+    if(LOG_DEBUG)
+    {
+        LOGE("释放 Audio");
+    }
+    if (audio){
+        audio->release();
+        delete audio;
+        audio = NULL;
+    }
+    if(calljava){
+        calljava = NULL;
+    }
+    if (playstatus){
+        playstatus = NULL;
+    }
+
 }

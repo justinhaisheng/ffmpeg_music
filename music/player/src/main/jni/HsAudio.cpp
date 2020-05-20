@@ -16,7 +16,8 @@ HsAudio::HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters
 }
 
 HsAudio::~HsAudio() {
-
+    av_free(resample_data);
+    resample_data = NULL;
 }
 
 void* decode_play(void* data){
@@ -313,3 +314,57 @@ void HsAudio::pause() {
         (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PAUSED);
     }
 }
+
+void HsAudio::stop() {
+    if (pcmPlayerPlay){
+        (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_STOPPED);
+    }
+}
+
+void HsAudio::release() {
+    stop();
+    if (queue){
+        delete queue;
+        queue = NULL;
+    }
+    if(codecpar){
+        avcodec_parameters_free(&codecpar);
+        codecpar = NULL;
+    }
+    if(avCodecContext != NULL)
+    {
+        avcodec_close(avCodecContext);
+        avcodec_free_context(&avCodecContext);
+        avCodecContext = NULL;
+    }
+    if(pcmPlayerObject)
+    {
+        (*pcmPlayerObject)->Destroy(pcmPlayerObject);
+        pcmPlayerObject = NULL;
+        pcmPlayerPlay = NULL;
+        pcmBufferQueue = NULL;
+    }
+
+    if(outputMixObject)
+    {
+        (*outputMixObject)->Destroy(outputMixObject);
+        outputMixObject = NULL;
+        outputMixEnvironmentalReverb = NULL;
+    }
+
+    if(engineObject)
+    {
+        (*engineObject)->Destroy(engineObject);
+        engineObject = NULL;
+        engineEngine = NULL;
+    }
+    if(playstatus)
+    {
+        playstatus = NULL;
+    }
+    if(calljava)
+    {
+        calljava = NULL;
+    }
+}
+

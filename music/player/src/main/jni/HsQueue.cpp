@@ -11,8 +11,12 @@ HsQueue::HsQueue(HsPlaystatus *playstatus) {
 }
 
 HsQueue::~HsQueue() {
+    clearQueue();
     pthread_mutex_destroy(&this->mutexPacket);
     pthread_cond_destroy(&this->condPacket);
+    if (playstatus){
+        playstatus = NULL;
+    }
 }
 
 int HsQueue::putPacket(AVPacket *packet) {
@@ -58,5 +62,24 @@ int HsQueue::getQueueSize() {
     size = this->queuePacket.size();
     pthread_mutex_unlock(&mutexPacket);
     return size;
+}
+
+
+void HsQueue::clearQueue() {
+    if(LOG_DEBUG)
+    {
+        LOGI("清除队列");
+    }
+    pthread_cond_signal(&condPacket);
+    pthread_mutex_lock(&mutexPacket);
+    while (!queuePacket.empty())
+    {
+        AVPacket *packet = queuePacket.front();
+        queuePacket.pop();
+        av_packet_free(&packet);
+        av_free(packet);
+        packet = NULL;
+    }
+    pthread_mutex_unlock(&mutexPacket);
 }
 

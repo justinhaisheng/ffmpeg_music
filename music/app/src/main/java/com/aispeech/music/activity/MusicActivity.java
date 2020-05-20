@@ -76,6 +76,10 @@ public class MusicActivity extends AppCompatActivity {
         mHsPlay.pause();
     }
 
+    public void stop(View view){
+        mHsPlay.stop();
+    }
+
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {

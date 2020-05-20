@@ -11,6 +11,7 @@
 extern "C"
 {
 #include "libavformat/avformat.h"
+#include <libavutil/time.h>
 };
 
 
@@ -20,8 +21,10 @@ public:
     HsCalljava *calljava = NULL;
     HsPlaystatus* playstatus = NULL;
     AVFormatContext* pFormatContext = NULL;
-    pthread_t decodeThread;
+    pthread_t decode_thread;
+    pthread_mutex_t decode_mutex;
     HsAudio *audio = NULL;
+    bool decode_exit;
 public:
     HsFFmpeg(HsCalljava* calljava,HsPlaystatus* playstatus, const char* url);
     ~HsFFmpeg();
@@ -31,6 +34,7 @@ public:
     void prepare();
     void start();
     void decodeFFmpegThread();
+    void release();
 };
 
 

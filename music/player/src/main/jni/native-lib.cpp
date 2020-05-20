@@ -89,6 +89,26 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1pause
     }
 }
 
+extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1stop
+        (JNIEnv *, jobject){
+    if(ffmpeg){
+        ffmpeg->release();
+        delete ffmpeg;
+        ffmpeg = NULL;
+
+        if (calljava){
+            delete calljava;
+            calljava = NULL;
+        }
+
+        if (playstatus){
+            delete playstatus;
+            playstatus = NULL;
+        }
+    }
+}
+
 
 extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){
