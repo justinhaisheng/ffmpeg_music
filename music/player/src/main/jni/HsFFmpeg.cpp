@@ -265,6 +265,7 @@ void HsFFmpeg::release() {
             av_usleep(1000 * 10);//暂停10毫秒
         }
     }
+    pthread_mutex_unlock(&decode_mutex);
     if(LOG_DEBUG)
     {
         LOGE("释放 Audio");

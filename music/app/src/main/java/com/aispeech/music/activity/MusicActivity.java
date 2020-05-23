@@ -67,11 +67,27 @@ public class MusicActivity extends AppCompatActivity {
         mHsPlay.setHsCompleteListener(new HsCompleteListener() {
             @Override
             public void complete() {
-                Log.d(HsPlay.TAG,"播放完成");
+                if (mHsPlay.getNextSource()){
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Log.e(HsPlay.TAG,"播放下一个");
+                            mHsPlay.prepare();
+                            mHsPlay.setNextSource("");
+                        }
+                    }).start();
+
+                }
             }
         });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3
-        mHsPlay.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+
     }
 
     public static void jumpMusicActivity(Context context){
@@ -79,6 +95,7 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     public void begin(View view) {
+        mHsPlay.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
         mHsPlay.prepare();
     }
 
@@ -91,6 +108,11 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     public void stop(View view){
+        mHsPlay.stop();
+    }
+
+    public void next(View view){
+        mHsPlay.setNextSource("http://ngcdn004.cnr.cn/live/dszs/index.m3u8");
         mHsPlay.stop();
     }
 

@@ -34,6 +34,12 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="next"
+        android:onClick="next"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="seek"
         android:onClick="seek"/>
 

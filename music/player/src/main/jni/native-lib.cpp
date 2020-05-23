@@ -57,6 +57,7 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1prepare
         ffmpeg = new HsFFmpeg(calljava,playstatus,source);
     }
     stop = false;
+    LOGD("prepare %d",stop);
     ffmpeg->prepare();
     env->ReleaseStringUTFChars(jsource,source);
 }
@@ -96,6 +97,8 @@ extern "C"
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1stop
         (JNIEnv *, jobject){
 
+    LOGE("stopping %d",stop);
+
     if(stop){
         if (LOG_DEBUG){
             LOGE("%s","had stopped");
@@ -118,6 +121,7 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1stop
             playstatus = NULL;
         }
     }
+    stop = false;
 }
 
 extern "C"

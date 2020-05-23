@@ -32,10 +32,24 @@ public class HsPlay {
     }
 
     private String mSource;//数据源
-
+    private boolean mNextSource = false;//下一个数据源
     public void setSource(String source){
         this.mSource = source;
     }
+
+    public void setNextSource(String nextSource){
+        if (!TextUtils.isEmpty(nextSource)){
+            this.mSource = nextSource;
+            mNextSource = true;
+        }else{
+            mNextSource = false;
+        }
+    }
+
+    public boolean getNextSource(){
+        return mNextSource;
+    }
+
 
     HsPrepareListener mHsPrepareListener;
     public void setHsPrepareListener(HsPrepareListener hsPrepareListener){

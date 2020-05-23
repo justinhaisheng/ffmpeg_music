@@ -153,12 +153,12 @@ void HsCalljava::onCallComplete(int thread_type) {
     }
     if (thread_type == MAIN_THREAD){
         if (LOG_DEBUG){
-            LOGD("onCallPrepare MAIN_THREAD");
+            LOGD("onCallComplete MAIN_THREAD");
         }
         this->jniEnv->CallVoidMethod(this->jobj,this->jmid_prepare);
     }else{
         if (LOG_DEBUG){
-            LOGD("onCallPrepare CHILD_THREAD");
+            LOGD("onCallComplete CHILD_THREAD");
         }
         JNIEnv *jniEnv2;
         if (this->javaVm->AttachCurrentThread(&jniEnv2,0)!=JNI_OK){
