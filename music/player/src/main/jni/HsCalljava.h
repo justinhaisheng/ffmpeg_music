@@ -22,6 +22,7 @@ public:
     jmethodID  jmid_load;
     jmethodID  jmid_timeinfo;
     jmethodID  jmid_error;
+    jmethodID  jmid_complete;
 public:
     HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj);
     ~HsCalljava();
@@ -30,6 +31,7 @@ public:
     void onCallLoading(bool load,int thread_type);
     void onCallTimeInfo(int current,int total,int thread_type);
     void onCallError(int code,char* msg,int thread_type);
+    void onCallComplete(int thread_type);
 };
 
 

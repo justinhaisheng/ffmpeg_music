@@ -22,6 +22,7 @@ public:
     HsPlaystatus* playstatus = NULL;
     AVFormatContext* pFormatContext = NULL;
     pthread_t decode_thread;
+    pthread_t start_thread;
     pthread_mutex_t decode_mutex;
     pthread_mutex_t seek_mutex;
     HsAudio *audio = NULL;
@@ -35,6 +36,7 @@ public:
     void prepare();
     void start();
     void decodeFFmpegThread();
+    void startFFmpegThread();
     void release();
 
     void seek(int64_t secs);

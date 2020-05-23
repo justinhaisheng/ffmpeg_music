@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.aispeech.HsTimeInfoBean;
+import com.aispeech.listener.HsCompleteListener;
 import com.aispeech.listener.HsErrorListener;
 import com.aispeech.listener.HsLoadingListener;
 import com.aispeech.listener.HsOnTimeInfoListener;
@@ -63,6 +64,12 @@ public class MusicActivity extends AppCompatActivity {
                 Log.e(HsPlay.TAG,"code:"+code+" codemsg:"+codemsg);
             }
         });
+        mHsPlay.setHsCompleteListener(new HsCompleteListener() {
+            @Override
+            public void complete() {
+                Log.d(HsPlay.TAG,"播放完成");
+            }
+        });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3
         mHsPlay.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
     }
@@ -101,6 +108,6 @@ public class MusicActivity extends AppCompatActivity {
     };
 
     public void seek(View view) {
-        mHsPlay.seek(100);
+        mHsPlay.seek(215);
     }
 }

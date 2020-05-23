@@ -37,87 +37,15 @@ void HsFFmpeg::prepare() {
     pthread_create(&decode_thread,NULL,ffmpegthread,this);
 }
 
+void* startthread(void* data){
+    HsFFmpeg* hsFFmpeg = static_cast<HsFFmpeg *>(data);
+    hsFFmpeg->startFFmpegThread();
+    pthread_exit(&hsFFmpeg->start_thread);
+}
+
 //解码
 void HsFFmpeg::start() {
-    if (!this->audio){
-        if(LOG_DEBUG){
-            LOGE("audio is null");
-            decode_exit = true;
-            return;
-        }
-    }
-
-    this->audio->play();//不停的去packet
-
-
-    int count = 0;
-    while(playstatus != NULL && !playstatus->exit){
-
-        if(this->playstatus->seek){
-            if(LOG_DEBUG){
-                LOGD("seek ...");
-            }
-            continue;
-        }
-//        if(audio->queue->getQueueSize() > 40)
-//        {
-//            if(LOG_DEBUG){
-//                LOGD("40 ...");
-//            }
-//            continue;
-//        }
-        AVPacket *avPacket = av_packet_alloc();
-        //获取每一帧数据
-        pthread_mutex_lock(&seek_mutex);
-        int ret = av_read_frame(this->pFormatContext,avPacket);
-        pthread_mutex_unlock(&seek_mutex);
-
-        if (ret == 0){
-            if(avPacket->stream_index == this->audio->streamIndex){//音频数据
-                count++;
-                if(LOG_DEBUG)
-                {
-                    LOGD("解封装第 %d 帧", count);
-                }
-                this->audio->queue->putPacket(avPacket);
-            }else{
-                av_packet_free(&avPacket);
-                av_free(avPacket);
-            }
-        }else{
-
-            av_packet_free(&avPacket);
-            av_free(avPacket);
-            while (playstatus && !playstatus->exit){
-                if (this->audio->queue->getQueueSize() > 0){
-                    continue;
-                }else{
-                    playstatus->exit = true;
-                    if(LOG_DEBUG)
-                    {
-                        LOGE("decode finished");
-                    }
-                    break;
-                }
-            }
-            break;
-        }
-    }
-
-    /*
-    while(this->audio->queue->getQueueSize()>0){
-        AVPacket* packet = av_packet_alloc();
-        this->audio->queue->getPacket(packet);
-        av_packet_free(&packet);
-        av_free(packet);
-        packet = NULL;
-    }
-    */
-    if(LOG_DEBUG)
-    {
-        LOGD("解码完成");
-    }
-    decode_exit = true;
+    pthread_create(&start_thread,NULL,startthread,this);
 }
 
 int interruptCallback(void* ctx){
@@ -220,6 +148,86 @@ void HsFFmpeg::decodeFFmpegThread() {
     //回调java方法
     this->calljava->onCallPrepare(CHILD_THREAD);
     pthread_mutex_unlock(&decode_mutex);
+}
+
+void HsFFmpeg::startFFmpegThread() {
+    if (!this->audio){
+        if(LOG_DEBUG){
+            LOGE("audio is null");
+            decode_exit = true;
+            return;
+        }
+    }
+
+    this->audio->play();//不停的去packet
+    int count = 0;
+    while(playstatus != NULL && !playstatus->exit){
+        if(this->playstatus->seek){
+            if(LOG_DEBUG){
+                LOGD("seek ...");
+            }
+            continue;
+        }
+        if(audio->queue->getQueueSize() > 40)//防止已经被解码完成，seek的时候会清空队列数据。
+        {
+            if(LOG_DEBUG){
+                LOGD("队列已满40 ...");
+            }
+            continue;
+        }
+        AVPacket *avPacket = av_packet_alloc();
+        //获取每一帧数据
+        pthread_mutex_lock(&seek_mutex);
+        int ret = av_read_frame(this->pFormatContext,avPacket);
+        pthread_mutex_unlock(&seek_mutex);
+
+        if (ret == 0){
+            if(avPacket->stream_index == this->audio->streamIndex){//音频数据
+                count++;
+                if(LOG_DEBUG)
+                {
+                    LOGD("解封装第 %d 帧", count);
+                }
+                this->audio->queue->putPacket(avPacket);
+            }else{
+                av_packet_free(&avPacket);
+                av_free(avPacket);
+            }
+        }else{
+
+            av_packet_free(&avPacket);
+            av_free(avPacket);
+            while (playstatus && !playstatus->exit){
+                if (this->audio->queue->getQueueSize() > 0){
+                    continue;
+                }else{
+                    playstatus->exit = true;
+                    if(LOG_DEBUG)
+                    {
+                        LOGE("decode finished");
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    /*
+    while(this->audio->queue->getQueueSize()>0){
+        AVPacket* packet = av_packet_alloc();
+        this->audio->queue->getPacket(packet);
+        av_packet_free(&packet);
+        av_free(packet);
+        packet = NULL;
+    }
+    */
+    if(LOG_DEBUG)
+    {
+        LOGD("解码完成");
+    }
+    decode_exit = true;
+    this->calljava->onCallComplete(CHILD_THREAD);
 }
 
 void HsFFmpeg::resume() {
