@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.aispeech.HsTimeInfoBean;
+import com.aispeech.listener.HsErrorListener;
 import com.aispeech.listener.HsLoadingListener;
 import com.aispeech.listener.HsOnTimeInfoListener;
 import com.aispeech.listener.HsPrepareListener;
@@ -56,8 +57,14 @@ public class MusicActivity extends AppCompatActivity {
                 Log.d(HsPlay.TAG,"当前时间："+timeInfoBean.getCurrentTime()+" 总时间："+timeInfoBean.getTotalTime());
             }
         });
+        mHsPlay.setHsErrorListener(new HsErrorListener() {
+            @Override
+            public void error(int code, String codemsg) {
+                Log.e(HsPlay.TAG,"code:"+code+" codemsg:"+codemsg);
+            }
+        });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3
-        mHsPlay.setSource("/sdcard/1.mp3");
+        mHsPlay.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
     }
 
     public static void jumpMusicActivity(Context context){

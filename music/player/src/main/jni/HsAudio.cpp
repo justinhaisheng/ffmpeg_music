@@ -328,7 +328,6 @@ void HsAudio::release() {
         queue = NULL;
     }
     if(codecpar){
-        avcodec_parameters_free(&codecpar);
         codecpar = NULL;
     }
     if(avCodecContext != NULL)

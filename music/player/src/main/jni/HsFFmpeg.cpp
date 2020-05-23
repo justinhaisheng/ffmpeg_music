@@ -129,6 +129,7 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("avformat_open_input error %s",this->url);
         }
+        this->calljava->onCallError(1001,"avformat_open_input error",CHILD_THREAD);
         this->decode_exit = true;
         pthread_mutex_unlock(&decode_mutex);
         return;
@@ -138,6 +139,7 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("avformat_find_stream_info error %s",this->url);
         }
+        this->calljava->onCallError(1002,"avformat_find_stream_info error",CHILD_THREAD);
         this->decode_exit = true;
         pthread_mutex_unlock(&decode_mutex);
         return;
@@ -159,6 +161,7 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("获取不到解码器");
         }
+        this->calljava->onCallError(1003,"获取不到解码器 error",CHILD_THREAD);
         this->decode_exit = true;
         pthread_mutex_unlock(&decode_mutex);
         return;
@@ -169,6 +172,7 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("获取不到解码器上下文");
         }
+        this->calljava->onCallError(1004,"获取不到解码器上下文 error",CHILD_THREAD);
         this->decode_exit = true;
         pthread_mutex_unlock(&decode_mutex);
         return;
@@ -178,6 +182,7 @@ void HsFFmpeg::decodeFFmpegThread() {
         if (LOG_DEBUG){
             LOGE("can not fill decodecctx");
         }
+        this->calljava->onCallError(1005,"can not fill decodecctx error",CHILD_THREAD);
         this->decode_exit = true;
         pthread_mutex_unlock(&decode_mutex);
         return;
@@ -188,6 +193,7 @@ void HsFFmpeg::decodeFFmpegThread() {
         {
             LOGE("cant not open audio strames");
         }
+        this->calljava->onCallError(1006,"cant not open audio strames error",CHILD_THREAD);
         this->decode_exit = true;
         pthread_mutex_unlock(&decode_mutex);
         return;

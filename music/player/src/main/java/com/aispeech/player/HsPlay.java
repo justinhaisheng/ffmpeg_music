@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.aispeech.HsTimeInfoBean;
+import com.aispeech.listener.HsErrorListener;
 import com.aispeech.listener.HsLoadingListener;
 import com.aispeech.listener.HsOnTimeInfoListener;
 import com.aispeech.listener.HsPrepareListener;
@@ -48,6 +49,11 @@ public class HsPlay {
     HsOnTimeInfoListener mHsOnTimeInfoListener;
     public void setHsOnTimeInfoListener(HsOnTimeInfoListener hsOnTimeInfoListener){
         this.mHsOnTimeInfoListener = hsOnTimeInfoListener;
+    }
+
+    HsErrorListener mHsErrorListener;
+    public void setHsErrorListener(HsErrorListener hsErrorListener){
+        this.mHsErrorListener = hsErrorListener;
     }
 
 
@@ -152,6 +158,13 @@ public class HsPlay {
             hsTimeInfoBean.setCurrentTime(currentTime);
             hsTimeInfoBean.setTotalTime(totalTime);
             mHsOnTimeInfoListener.onTimeInfo(hsTimeInfoBean);
+        }
+    }
+
+    private void onCallError(int code,String codemsg){
+        stop();
+        if (mHsErrorListener!=null){
+            mHsErrorListener.error(code,codemsg);
         }
     }
 
