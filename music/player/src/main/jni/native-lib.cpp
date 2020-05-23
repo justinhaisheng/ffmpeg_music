@@ -120,6 +120,13 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1stop
     }
 }
 
+extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seek
+        (JNIEnv *, jobject instance, jint ses){
+    if(ffmpeg){
+        ffmpeg->seek(ses);
+    }
+}
 
 extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){

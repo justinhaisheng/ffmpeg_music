@@ -111,10 +111,6 @@ public class HsPlay {
     }
 
     public void stop(){
-//        if (TextUtils.isEmpty(mSource)){
-//            Log.e(TAG,"start resume == NULL");
-//            return;
-//        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -123,6 +119,14 @@ public class HsPlay {
         }).start();
     }
 
+    public void seek(final int seconds){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                n_seek(seconds);
+            }
+        }).start();
+    }
 
     /*
     *C++ 回调 java的方法
@@ -174,7 +178,7 @@ public class HsPlay {
     private native void n_resume();
     private native void n_pause();
     private native void n_stop();
-
+    private native void n_seek(int sencods);
 
 
 }

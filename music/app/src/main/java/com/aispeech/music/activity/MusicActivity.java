@@ -99,4 +99,8 @@ public class MusicActivity extends AppCompatActivity {
             }
         }
     };
+
+    public void seek(View view) {
+        mHsPlay.seek(100);
+    }
 }

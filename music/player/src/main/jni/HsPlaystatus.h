@@ -10,6 +10,7 @@ class HsPlaystatus {
 public:
     bool exit;
     bool load;
+    bool seek;
 public:
     HsPlaystatus();
 };

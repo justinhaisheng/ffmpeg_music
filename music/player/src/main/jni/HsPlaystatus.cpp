@@ -7,5 +7,5 @@
 HsPlaystatus::HsPlaystatus() {
     exit = false;
     load = true;
-
+    seek = false;
 }

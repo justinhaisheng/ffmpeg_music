@@ -47,6 +47,14 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1pause
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1stop
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_aispeech_player_HsPlay
+ * Method:    n_seek
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seek
+  (JNIEnv *, jobject, jint);
+
 #ifdef __cplusplus
 }
 #endif

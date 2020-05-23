@@ -23,6 +23,7 @@ public:
     AVFormatContext* pFormatContext = NULL;
     pthread_t decode_thread;
     pthread_mutex_t decode_mutex;
+    pthread_mutex_t seek_mutex;
     HsAudio *audio = NULL;
     bool decode_exit;
 public:
@@ -35,6 +36,8 @@ public:
     void start();
     void decodeFFmpegThread();
     void release();
+
+    void seek(int64_t secs);
 };
 
 

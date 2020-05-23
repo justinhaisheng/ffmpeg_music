@@ -11,12 +11,14 @@ HsFFmpeg::HsFFmpeg(HsCalljava* calljava,HsPlaystatus* playstatus, const char* ur
     this->url = static_cast<char *>(malloc(sizeof(char) * strlen(url)));
     strcpy(this->url,url);
     pthread_mutex_init(&decode_mutex,NULL);
+    pthread_mutex_init(&seek_mutex,NULL);
     decode_exit = false;
 }
 
 HsFFmpeg::~HsFFmpeg() {
     free(url);
     pthread_mutex_destroy(&decode_mutex);
+    pthread_mutex_destroy(&seek_mutex);
     if(pFormatContext){
         avformat_close_input(&pFormatContext);
         avformat_free_context(pFormatContext);
@@ -45,15 +47,32 @@ void HsFFmpeg::start() {
         }
     }
 
-    this->audio->play();
+    this->audio->play();//不停的去packet
 
 
     int count = 0;
     while(playstatus != NULL && !playstatus->exit){
-        AVPacket *avPacket = av_packet_alloc();
 
+        if(this->playstatus->seek){
+            if(LOG_DEBUG){
+                LOGD("seek ...");
+            }
+            continue;
+        }
+//        if(audio->queue->getQueueSize() > 40)
+//        {
+//            if(LOG_DEBUG){
+//                LOGD("40 ...");
+//            }
+//            continue;
+//        }
+        AVPacket *avPacket = av_packet_alloc();
         //获取每一帧数据
-        if (av_read_frame(this->pFormatContext,avPacket) == 0){
+        pthread_mutex_lock(&seek_mutex);
+        int ret = av_read_frame(this->pFormatContext,avPacket);
+        pthread_mutex_unlock(&seek_mutex);
+
+        if (ret == 0){
             if(avPacket->stream_index == this->audio->streamIndex){//音频数据
                 count++;
                 if(LOG_DEBUG)
@@ -253,5 +272,25 @@ void HsFFmpeg::release() {
     if (playstatus){
         playstatus = NULL;
     }
+}
+
+void HsFFmpeg::seek(int64_t secs) {
+    if (this->audio->total_duration == 0 || secs <= 0 || secs > this->audio->total_duration){
+        if(LOG_DEBUG){
+            LOGE("seek 参数有误");
+        }
+        this->calljava->onCallError(1007,"seek 参数有误",MAIN_THREAD);
+        return;
+    }
+    LOGD("seek");
+    this->playstatus->seek = true;
+    this->audio->queue->clearQueue();//清除队列里面的数据
+    this->audio->play_clock = 0;
+    this->audio->play_last_clock = 0;
+    pthread_mutex_lock(&seek_mutex);
+    int64_t rel_secs = secs * AV_TIME_BASE;
+    avformat_seek_file(this->pFormatContext,-1,INT64_MIN,rel_secs,INT32_MAX,0);
+    pthread_mutex_unlock(&seek_mutex);
+    this->playstatus->seek = false;
 
 }
