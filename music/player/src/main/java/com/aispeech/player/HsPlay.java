@@ -131,6 +131,8 @@ public class HsPlay {
     }
 
     public void stop(){
+        onCallTimeInfo(0,0);
+        hsTimeInfoBean = null;
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -365,5 +365,8 @@ void HsAudio::release() {
     {
         calljava = NULL;
     }
+    this->play_clock = 0;
+    this->play_last_clock = 0;
+    this->total_duration = 0;
 }
 

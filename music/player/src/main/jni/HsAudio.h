@@ -31,7 +31,7 @@ public:
     pthread_t thread_play;
     uint8_t* resample_data = NULL;//重采样后的数据
     //size_t   resample_data_size = 0;
-    int total_duration = 0;//总时长
+    size_t total_duration = 0;//总时长
     AVRational FRAME_TIME_BASE;//frame的单位时间
     double play_clock = 0;//总的播放时长
     double play_frame_now_time;//当前frame的时间
