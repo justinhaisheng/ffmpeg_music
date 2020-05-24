@@ -150,6 +150,13 @@ public class HsPlay {
         }).start();
     }
 
+    public int getDuration(){
+        if(hsTimeInfoBean!=null){
+            return hsTimeInfoBean.getTotalTime();
+        }
+        return 0;
+    }
+
     /*
     *C++ 回调 java的方法
     *@author luhaisheng

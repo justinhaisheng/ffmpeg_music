@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.aispeech.HsTimeInfoBean;
@@ -23,13 +24,16 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MusicActivity extends AppCompatActivity {
 
     HsPlay mHsPlay;
+    boolean isSeek = false;
     private TextView tvTime;
-
+    SeekBar mSeekBar;
+    private int mPlayPosition = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music);
         tvTime = findViewById(R.id.tv_time);
+        mSeekBar = findViewById(R.id.seekbar_seek);
         mHsPlay = new HsPlay();
         mHsPlay.setHsPrepareListener(new HsPrepareListener() {
             @Override
@@ -87,7 +91,27 @@ public class MusicActivity extends AppCompatActivity {
             }
         });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(mHsPlay.getDuration() >0 && isSeek){
+                    mPlayPosition = mHsPlay.getDuration() * progress / 100;
+                }
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                isSeek = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if(isSeek){
+                    mHsPlay.seek(mPlayPosition);
+                }
+                isSeek = false;
+            }
+        });
     }
 
     public static void jumpMusicActivity(Context context){
@@ -125,6 +149,13 @@ public class MusicActivity extends AppCompatActivity {
                 HsTimeInfoBean wlTimeInfoBean = (HsTimeInfoBean) msg.obj;
                 tvTime.setText(HsTimeUtil.secdsToDateFormat(wlTimeInfoBean.getTotalTime(), wlTimeInfoBean.getTotalTime())
                         + "/" + HsTimeUtil.secdsToDateFormat(wlTimeInfoBean.getCurrentTime(), wlTimeInfoBean.getTotalTime()));
+
+                if(wlTimeInfoBean.getTotalTime()>0){
+                    mSeekBar.setProgress(wlTimeInfoBean.getCurrentTime() * 100  / wlTimeInfoBean.getTotalTime() );
+                }else{
+                    mSeekBar.setProgress(0);
+                }
+
             }
         }
     };
