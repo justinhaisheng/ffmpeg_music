@@ -150,6 +150,10 @@ public class HsPlay {
         }).start();
     }
 
+    public void seekVolume(final int progress){
+        n_seekVolume(progress);
+    }
+
     public int getDuration(){
         if(hsTimeInfoBean!=null){
             return hsTimeInfoBean.getTotalTime();
@@ -215,6 +219,6 @@ public class HsPlay {
     private native void n_pause();
     private native void n_stop();
     private native void n_seek(int sencods);
-
+    private native void n_seekVolume(int volume);
 
 }

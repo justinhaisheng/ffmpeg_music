@@ -55,6 +55,14 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1stop
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seek
   (JNIEnv *, jobject, jint);
 
+/*
+ * Class:     com_aispeech_player_HsPlay
+ * Method:    n_seekVolume
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seekVolume
+  (JNIEnv *, jobject, jint);
+
 #ifdef __cplusplus
 }
 #endif

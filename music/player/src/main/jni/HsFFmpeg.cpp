@@ -159,6 +159,8 @@ void HsFFmpeg::startFFmpegThread() {
         }
     }
 
+    setVolume(50);
+
     this->audio->play();//不停的去packet
     int count = 0;
     while(playstatus != NULL && !playstatus->exit){
@@ -302,4 +304,10 @@ void HsFFmpeg::seek(int64_t secs) {
     pthread_mutex_unlock(&seek_mutex);
     this->playstatus->seek = false;
 
+}
+
+void HsFFmpeg::setVolume(int volume) {
+    if (this->audio){
+        this->audio->setVolume(volume);
+    }
 }

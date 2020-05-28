@@ -133,6 +133,14 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seek
 }
 
 extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seekVolume
+        (JNIEnv *env, jobject instance, jint progress){
+    if(ffmpeg){
+        ffmpeg->setVolume(progress);
+    }
+}
+
+extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){
     jint result = -1;
     javaVM = vm;

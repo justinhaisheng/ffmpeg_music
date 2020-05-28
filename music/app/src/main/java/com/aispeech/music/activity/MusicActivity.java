@@ -25,8 +25,10 @@ public class MusicActivity extends AppCompatActivity {
 
     HsPlay mHsPlay;
     boolean isSeek = false;
+    //boolean isVolumeSeek = false;
     private TextView tvTime;
     SeekBar mSeekBar;
+    SeekBar mVolumeSeekBar;
     private int mPlayPosition = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,8 @@ public class MusicActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music);
         tvTime = findViewById(R.id.tv_time);
         mSeekBar = findViewById(R.id.seekbar_seek);
+        mVolumeSeekBar = findViewById(R.id.seekbar_volume);
+        findViewById(R.id.seekbar_volume);
         mHsPlay = new HsPlay();
         mHsPlay.setHsPrepareListener(new HsPrepareListener() {
             @Override
@@ -110,6 +114,26 @@ public class MusicActivity extends AppCompatActivity {
                     mHsPlay.seek(mPlayPosition);
                 }
                 isSeek = false;
+            }
+        });
+        mVolumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mHsPlay.seekVolume(progress);
+                //tvVolume.setText("音量：" + wlPlayer.getVolumePercent() + "%");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+//                isVolumeSeek = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+//                if (isVolumeSeek){
+//                    mHsPlay.seekVolume(seekBar);
+//                }
+//                isVolumeSeek = false;
             }
         });
     }

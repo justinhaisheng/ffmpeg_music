@@ -40,6 +40,7 @@ public:
     void release();
 
     void seek(int64_t secs);
+    void setVolume(int volume);
 };
 
 
