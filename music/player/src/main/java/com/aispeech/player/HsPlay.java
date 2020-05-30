@@ -154,6 +154,15 @@ public class HsPlay {
         n_seekVolume(progress);
     }
 
+    public void setMute(final MuteEnum mute){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                n_mute(mute.getValue());
+            }
+        }).start();
+    }
+
     public int getDuration(){
         if(hsTimeInfoBean!=null){
             return hsTimeInfoBean.getTotalTime();
@@ -220,5 +229,5 @@ public class HsPlay {
     private native void n_stop();
     private native void n_seek(int sencods);
     private native void n_seekVolume(int volume);
-
+    private native void n_mute(int mute);
 }

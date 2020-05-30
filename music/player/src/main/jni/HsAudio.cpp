@@ -89,9 +89,10 @@ void HsAudio::initOpenSLES() {
 
     SLDataSource slDataSource = {&android_queue, &pcm};
     SLDataSink audioSnk = {&outputMix, NULL};
-    const SLInterfaceID ids[2] = {SL_IID_BUFFERQUEUE,SL_IID_VOLUME};
-    const SLboolean req[2] = {SL_BOOLEAN_TRUE,SL_BOOLEAN_TRUE};
-    result = (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObject, &slDataSource, &audioSnk,1, ids, req);
+
+    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE,SL_IID_VOLUME,SL_IID_MUTESOLO};
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE,SL_BOOLEAN_TRUE,SL_BOOLEAN_TRUE};
+    result = (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObject, &slDataSource, &audioSnk,3, ids, req);
     (void)result;
     // 初始化播放器
     result = (*pcmPlayerObject)->Realize(pcmPlayerObject, SL_BOOLEAN_FALSE);
@@ -102,6 +103,10 @@ void HsAudio::initOpenSLES() {
 
     //获取音量的接口
     result = (*pcmPlayerObject)->GetInterface(pcmPlayerObject,SL_IID_VOLUME,&volumeObject);
+    (void)result;
+
+    //muteObject
+    result = (*pcmPlayerObject)->GetInterface(pcmPlayerObject,SL_IID_MUTESOLO,&muteObject);
     (void)result;
 
     //第四步---------------------------------------
@@ -414,6 +419,27 @@ void HsAudio::setVolume(int volume) {
         }
         else{
             (*volumeObject)->SetVolumeLevel(volumeObject, (100 - volume) * -100);
+        }
+    }
+}
+
+void HsAudio::setMute(int mute) {
+    if(muteObject != NULL)
+    {
+        if(mute == 0)//right
+        {
+            (*muteObject)->SetChannelMute(muteObject, 1, false);
+            (*muteObject)->SetChannelMute(muteObject, 0, true);
+        }
+        else if(mute == 1)//left
+        {
+            (*muteObject)->SetChannelMute(muteObject, 1, true);
+            (*muteObject)->SetChannelMute(muteObject, 0, false);
+        }
+        else if(mute == 2)//center
+        {
+            (*muteObject)->SetChannelMute(muteObject, 1, false);
+            (*muteObject)->SetChannelMute(muteObject, 0, false);
         }
     }
 }

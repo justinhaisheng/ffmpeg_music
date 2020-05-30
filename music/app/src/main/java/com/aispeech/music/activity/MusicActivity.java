@@ -18,6 +18,7 @@ import com.aispeech.listener.HsOnTimeInfoListener;
 import com.aispeech.listener.HsPrepareListener;
 import com.aispeech.music.R;
 import com.aispeech.player.HsPlay;
+import com.aispeech.player.MuteEnum;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -186,5 +187,17 @@ public class MusicActivity extends AppCompatActivity {
 
     public void seek(View view) {
         mHsPlay.seek(215);
+    }
+
+    public void left(View view) {
+        mHsPlay.setMute(MuteEnum.MUTE_LEFT);
+    }
+
+    public void right(View view) {
+        mHsPlay.setMute(MuteEnum.MUTE_RIGHT);
+    }
+
+    public void center(View view) {
+        mHsPlay.setMute(MuteEnum.MUTE_CENTER);
     }
 }

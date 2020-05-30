@@ -63,6 +63,14 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seek
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1seekVolume
   (JNIEnv *, jobject, jint);
 
+/*
+ * Class:     com_aispeech_player_HsPlay
+ * Method:    n_mute
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1mute
+  (JNIEnv *, jobject, jint);
+
 #ifdef __cplusplus
 }
 #endif

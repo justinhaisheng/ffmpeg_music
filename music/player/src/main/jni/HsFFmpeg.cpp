@@ -45,6 +45,8 @@ void* startthread(void* data){
 
 //解码
 void HsFFmpeg::start() {
+    setVolume(50);
+    setMute(2);
     pthread_create(&start_thread,NULL,startthread,this);
 }
 
@@ -309,5 +311,11 @@ void HsFFmpeg::seek(int64_t secs) {
 void HsFFmpeg::setVolume(int volume) {
     if (this->audio){
         this->audio->setVolume(volume);
+    }
+}
+
+void HsFFmpeg::setMute(int mute) {
+    if (this->audio){
+        audio->setMute(mute);
     }
 }
