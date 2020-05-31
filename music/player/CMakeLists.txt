@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 #引入头文件
 include_directories(src/main/jni/include)
+include_directories(src/main/jni/SoundTouch/include)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -24,7 +25,20 @@ add_library( # Sets the name of the library.
         src/main/jni/HsFFmpeg.cpp
         src/main/jni/HsAudio.cpp
         src/main/jni/HsPlaystatus.cpp
-        src/main/jni/HsQueue.cpp)
+        src/main/jni/HsQueue.cpp
+
+        src/main/jni/SoundTouch/AAFilter.cpp
+        src/main/jni/SoundTouch/FIFOSampleBuffer.cpp
+        src/main/jni/SoundTouch/FIRFilter.cpp
+        src/main/jni/SoundTouch/cpu_detect_x86.cpp
+        src/main/jni/SoundTouch/sse_optimized.cpp
+        src/main/jni/SoundTouch/RateTransposer.cpp
+        src/main/jni/SoundTouch/SoundTouch.cpp
+        src/main/jni/SoundTouch/InterpolateCubic.cpp
+        src/main/jni/SoundTouch/InterpolateLinear.cpp
+        src/main/jni/SoundTouch/InterpolateShannon.cpp
+        src/main/jni/SoundTouch/TDStretch.cpp
+        src/main/jni/SoundTouch/PeakFinder.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
