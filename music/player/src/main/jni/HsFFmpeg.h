@@ -42,6 +42,8 @@ public:
     void seek(int64_t secs);
     void setVolume(int volume);
     void setMute(int mute);
+    void setPitch(float pitch);
+    void setSpeed(float speed);
 };
 
 

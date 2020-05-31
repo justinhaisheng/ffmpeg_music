@@ -163,6 +163,16 @@ public class HsPlay {
         }).start();
     }
 
+    public void setPitch(float p)
+    {
+        n_pitch(p);
+    }
+
+    public void setSpeed(float s)
+    {
+        n_speed(s);
+    }
+
     public int getDuration(){
         if(hsTimeInfoBean!=null){
             return hsTimeInfoBean.getTotalTime();
@@ -230,4 +240,7 @@ public class HsPlay {
     private native void n_seek(int sencods);
     private native void n_seekVolume(int volume);
     private native void n_mute(int mute);
+
+    private native void n_pitch(float pitch);
+    private native void n_speed(float speed);
 }

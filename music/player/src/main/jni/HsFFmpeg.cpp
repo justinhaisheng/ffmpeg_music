@@ -319,3 +319,15 @@ void HsFFmpeg::setMute(int mute) {
         audio->setMute(mute);
     }
 }
+
+void HsFFmpeg::setPitch(float pitch) {
+    if (audio){
+        audio->setPitch(pitch);
+    }
+}
+
+void HsFFmpeg::setSpeed(float speed) {
+    if (audio){
+        audio->setSpeed(speed);
+    }
+}

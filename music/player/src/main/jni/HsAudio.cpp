@@ -13,11 +13,23 @@ HsAudio::HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters
 
     queue = new HsQueue(this->playstatus);
     resample_data = static_cast<uint8_t *>(av_malloc(sample_rate * 2 * 2));//申请一秒的数据量大小
+    //双通道 16位 yuv
+    sampleBuffer = static_cast<SAMPLETYPE *>(malloc(sample_rate * 2 * 2 * 1));
+    soundTouch = new SoundTouch();
+    soundTouch->setSampleRate(sample_rate);
+    soundTouch->setChannels(2);
+    sound_finished = true;
+    setPitch(1.0f);
+    setSpeed(1.0f);
 }
 
 HsAudio::~HsAudio() {
     av_free(resample_data);
+    free(sampleBuffer);
+    sampleBuffer = NULL;
     resample_data = NULL;
+    delete soundTouch;
+    soundTouch = NULL;
 }
 
 void* decode_play(void* data){
@@ -34,7 +46,8 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
 {
     HsAudio* audio = static_cast<HsAudio *>(context);
     if (audio){
-        int buffer_size= audio->resampleAudio();
+        //int buffer_size= audio->resampleAudio(reinterpret_cast<void **>(NULL));
+        int buffer_size = audio->getSoundTouchData();
         // for streaming playback, replace this test by logic to find and fill the next buffer
         if (buffer_size > 0) {
             //SLresult result;
@@ -128,7 +141,7 @@ void HsAudio::initOpenSLES() {
 }
 
 
-int HsAudio::resampleAudio() {
+int HsAudio::resampleAudio(void **pcmbuf) {
     while(this->playstatus && !this->playstatus->exit){
 
         if (this->queue->getQueueSize() == 0){//没有数据
@@ -229,10 +242,11 @@ int HsAudio::resampleAudio() {
 //        swr_convert(struct SwrContext *s, uint8_t **out, int out_count,
 //        const uint8_t **in , int in_count);
         //重采样后得到采样后的数据个数，按理来说resample_nb == avFrame->nb_samples
-        int resample_nb = swr_convert(swr_ctx,  &resample_data,avFrame->nb_samples,
+        resample_nb = swr_convert(swr_ctx,  &resample_data,avFrame->nb_samples,
                              reinterpret_cast<const uint8_t **>(&avFrame->data), avFrame->nb_samples);
 
 
+        *pcmbuf = resample_data;
         LOGI("resample_nb = %d,avFrame->nb_samples = %d",resample_nb,avFrame->nb_samples);
 
         int resample_data_size = resample_nb * avFrame->channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
@@ -384,7 +398,7 @@ void HsAudio::release() {
 
 void HsAudio::setVolume(int volume) {
     if(volumeObject){
-        this->volume = volume;
+        //this->volume = volume;
         if(volume > 30)
         {
             (*volumeObject)->SetVolumeLevel(volumeObject, (100 - volume) * -20);
@@ -441,6 +455,65 @@ void HsAudio::setMute(int mute) {
             (*muteObject)->SetChannelMute(muteObject, 1, false);
             (*muteObject)->SetChannelMute(muteObject, 0, false);
         }
+    }
+}
+
+int HsAudio::getSoundTouchData() {
+    int sound_num = 0;
+    int buffer_size = 0;
+    while (playstatus !=NULL && !playstatus->exit){
+        sound_out_buffer = NULL;
+        if(sound_finished){
+            sound_finished = false;
+            buffer_size = resampleAudio(reinterpret_cast<void **>(&sound_out_buffer));
+            if (buffer_size > 0){//拿到重采样后的数据进行转换
+                /*
+                 * 因为FFmpeg解码出来的PCM数据是8bit （uint8）的，而SoundTouch中最低
+                    是16bit（ 16bit integer samples ），所以我们需要将8bit的数据转换成16bit
+                    后再给SoundTouch处理。处理方式：由于PCM数据在内存中是顺序排列的，所以我们先将第一个8bit的数据复制
+                    到16bit内存的前8位，然后后8bit的数据再复制给16bit内存的后8bit，就能把16bit的内存填满，然后循环复制，直到把8bit的内存全部复制到16bit的内存
+                    中，计算公式如下：
+                    for(int i = 0; i < data_size / 2 + 1; i++)
+                    {
+	                  sampleBuffer[i] = (buffer[i * 2] | ((buffer[i * 2 + 1]) << 8));
+                   }
+                 * */
+                for(int i = 0; i < buffer_size / 2 + 1; i++)
+                {
+                    sampleBuffer[i] = (sound_out_buffer[i * 2] | ((sound_out_buffer[i * 2 + 1]) << 8));
+                }
+                soundTouch->putSamples(sampleBuffer,resample_nb);
+                sound_num = soundTouch->receiveSamples(sampleBuffer,buffer_size / (2 * 2));
+            }else{
+                soundTouch->flush();
+            }
+        }
+        if (sound_num == 0){
+            sound_finished = true;
+            continue;
+        }else{
+            if (sound_out_buffer == NULL){
+                sound_num = soundTouch->receiveSamples(sampleBuffer,buffer_size / (2 * 2));
+                if (sound_num == 0){
+                    sound_finished = true;
+                    continue;
+                }
+            }
+            return sound_num * 2 * 2;
+        }
+    }
+    return 0;
+}
+
+void HsAudio::setPitch(float pitch) {
+    if (soundTouch){
+        soundTouch->setPitch(pitch);
+    }
+}
+
+void HsAudio::setSpeed(float speed) {
+    if (soundTouch){
+        soundTouch->setTempo(speed);
     }
 }
 

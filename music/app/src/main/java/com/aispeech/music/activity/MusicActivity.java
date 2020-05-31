@@ -200,4 +200,24 @@ public class MusicActivity extends AppCompatActivity {
     public void center(View view) {
         mHsPlay.setMute(MuteEnum.MUTE_CENTER);
     }
+
+    public void speed(View view) {
+        mHsPlay.setSpeed(1.5f);
+        mHsPlay.setPitch(1.0f);
+    }
+
+    public void pitch(View view) {
+        mHsPlay.setPitch(1.5f);
+        mHsPlay.setSpeed(1.0f);
+    }
+
+    public void speedpitch(View view) {
+        mHsPlay.setSpeed(1.5f);
+        mHsPlay.setPitch(1.5f);
+    }
+
+    public void normalspeedpitch(View view) {
+        mHsPlay.setSpeed(1.0f);
+        mHsPlay.setPitch(1.0f);
+    }
 }
