@@ -30,6 +30,7 @@ HsAudio::~HsAudio() {
     resample_data = NULL;
     delete soundTouch;
     soundTouch = NULL;
+    sound_out_buffer = NULL;
 }
 
 void* decode_play(void* data){
@@ -46,7 +47,7 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
 {
     HsAudio* audio = static_cast<HsAudio *>(context);
     if (audio){
-        //int buffer_size= audio->resampleAudio(reinterpret_cast<void **>(NULL));
+        //int buffer_size= audio->resampleAudio();
         int buffer_size = audio->getSoundTouchData();
         // for streaming playback, replace this test by logic to find and fill the next buffer
         if (buffer_size > 0) {
@@ -141,7 +142,7 @@ void HsAudio::initOpenSLES() {
 }
 
 
-int HsAudio::resampleAudio(void **pcmbuf) {
+int HsAudio::resampleAudio() {
     while(this->playstatus && !this->playstatus->exit){
 
         if (this->queue->getQueueSize() == 0){//没有数据
@@ -246,7 +247,6 @@ int HsAudio::resampleAudio(void **pcmbuf) {
                              reinterpret_cast<const uint8_t **>(&avFrame->data), avFrame->nb_samples);
 
 
-        *pcmbuf = resample_data;
         LOGI("resample_nb = %d,avFrame->nb_samples = %d",resample_nb,avFrame->nb_samples);
 
         int resample_data_size = resample_nb * avFrame->channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
@@ -465,7 +465,8 @@ int HsAudio::getSoundTouchData() {
         sound_out_buffer = NULL;
         if(sound_finished){
             sound_finished = false;
-            buffer_size = resampleAudio(reinterpret_cast<void **>(&sound_out_buffer));
+            buffer_size = resampleAudio();
+            sound_out_buffer = resample_data;
             if (buffer_size > 0){//拿到重采样后的数据进行转换
                 /*
                  * 因为FFmpeg解码出来的PCM数据是8bit （uint8）的，而SoundTouch中最低

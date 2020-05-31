@@ -73,7 +73,7 @@ public:
     void play();
     void pause();
     void resume();
-    int resampleAudio(void **pcmbuf);
+    int resampleAudio();
     void stop();
     void release();
     void setMute(int mute);
