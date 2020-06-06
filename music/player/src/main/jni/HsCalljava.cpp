@@ -22,6 +22,7 @@ HsCalljava::HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj) {
     jmid_error = env->GetMethodID(jclz,"onCallError","(ILjava/lang/String;)V");
 
     jmid_complete = env->GetMethodID(jclz,"onCallComplete","()V");
+    jmid_db = env->GetMethodID(jclz,"onCallValumeDB","(I)V");
 }
 
 HsCalljava::~HsCalljava() {
@@ -168,6 +169,34 @@ void HsCalljava::onCallComplete(int thread_type) {
             return;
         }
         jniEnv2->CallVoidMethod(this->jobj,this->jmid_complete);
+        this->javaVm->DetachCurrentThread();
+    }
+}
+
+void HsCalljava::onCallDB(int db, int thread_type) {
+    if (!jmid_db){
+        if (LOG_DEBUG){
+            LOGE("jmid_db is null");
+        }
+        return;
+    }
+    if (thread_type == MAIN_THREAD){
+        if (LOG_DEBUG){
+            LOGD("onCallDB MAIN_THREAD");
+        }
+        this->jniEnv->CallVoidMethod(this->jobj,this->jmid_db,db);
+    }else{
+        if (LOG_DEBUG){
+            LOGD("onCallDB CHILD_THREAD");
+        }
+        JNIEnv *jniEnv2;
+        if (this->javaVm->AttachCurrentThread(&jniEnv2,0)!=JNI_OK){
+            if (LOG_DEBUG){
+                LOGE("get child thread jnienv worng");
+            }
+            return;
+        }
+        jniEnv2->CallVoidMethod(this->jobj,this->jmid_db,db);
         this->javaVm->DetachCurrentThread();
     }
 }

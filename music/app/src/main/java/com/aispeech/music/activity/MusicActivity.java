@@ -16,6 +16,7 @@ import com.aispeech.listener.HsErrorListener;
 import com.aispeech.listener.HsLoadingListener;
 import com.aispeech.listener.HsOnTimeInfoListener;
 import com.aispeech.listener.HsPrepareListener;
+import com.aispeech.listener.HsValumeDBListener;
 import com.aispeech.music.R;
 import com.aispeech.player.HsPlay;
 import com.aispeech.player.MuteEnum;
@@ -93,6 +94,12 @@ public class MusicActivity extends AppCompatActivity {
                     }).start();
 
                 }
+            }
+        });
+        mHsPlay.setHsValumeDBListener(new HsValumeDBListener() {
+            @Override
+            public void onDbValue(int db) {
+                Log.w(HsPlay.TAG,"onDbValue db"+db);
             }
         });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3

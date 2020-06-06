@@ -9,6 +9,7 @@ import com.aispeech.listener.HsErrorListener;
 import com.aispeech.listener.HsLoadingListener;
 import com.aispeech.listener.HsOnTimeInfoListener;
 import com.aispeech.listener.HsPrepareListener;
+import com.aispeech.listener.HsValumeDBListener;
 
 /**
  * @创建者 luhaisheng
@@ -74,6 +75,11 @@ public class HsPlay {
     HsCompleteListener mHsCompleteListener;
     public void setHsCompleteListener(HsCompleteListener hsCompleteListener){
         this.mHsCompleteListener = hsCompleteListener;
+    }
+
+    HsValumeDBListener mHsValumeDBListener;
+    public void setHsValumeDBListener(HsValumeDBListener hsValumeDBListener){
+        this.mHsValumeDBListener = hsValumeDBListener;
     }
 
 
@@ -228,6 +234,12 @@ public class HsPlay {
         stop();
         if (mHsCompleteListener!=null){
             mHsCompleteListener.complete();
+        }
+    }
+
+    private void onCallValumeDB(int db){
+        if (mHsValumeDBListener!=null){
+            mHsValumeDBListener.onDbValue(db);
         }
     }
 

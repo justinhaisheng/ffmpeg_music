@@ -81,6 +81,8 @@ public:
     int getSoundTouchData();
     void setPitch(float pitch);
     void setSpeed(float speed);
+    int getPCMDB(uint8_t* pcmData,size_t pcmSize);
+
 };
 
 

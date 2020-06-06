@@ -53,7 +53,9 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
         if (buffer_size > 0) {
             //SLresult result;
             // enqueue another buffer
-            (*audio->pcmBufferQueue)->Enqueue(audio->pcmBufferQueue, (char *)audio->resample_data,buffer_size);
+            audio->calljava->onCallDB(audio->getPCMDB(
+                    reinterpret_cast<uint8_t *>(audio->sampleBuffer), buffer_size), CHILD_THREAD);
+            (*audio->pcmBufferQueue)->Enqueue(audio->pcmBufferQueue, (char *)audio->sampleBuffer,buffer_size);
             LOGE("Enqueue %d",buffer_size);
             // the most likely other result is SL_RESULT_BUFFER_INSUFFICIENT,
             // which for this code example would indicate a programming error
@@ -516,5 +518,22 @@ void HsAudio::setSpeed(float speed) {
     if (soundTouch){
         soundTouch->setTempo(speed);
     }
+}
+
+int HsAudio::getPCMDB(uint8_t *pcmData, size_t pcmSize) {
+    int db = 0;
+    short int pervalue = 0;
+    double sum = 0;
+    for(int i = 0; i < pcmSize; i+= 2)
+    {
+        memcpy(&pervalue, pcmData+i, 2);
+        sum += abs(pervalue);
+    }
+    sum = sum / (pcmSize / 2);
+    if(sum > 0)
+    {
+        db = (int)20.0 *log10(sum);
+    }
+    return db;
 }
 
