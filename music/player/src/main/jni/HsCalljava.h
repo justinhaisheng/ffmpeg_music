@@ -24,6 +24,7 @@ public:
     jmethodID  jmid_error;
     jmethodID  jmid_complete;
     jmethodID  jmid_db;
+    jmethodID  jmid_pcm_to_aac;
 public:
     HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj);
     ~HsCalljava();
@@ -34,6 +35,7 @@ public:
     void onCallError(int code,char* msg,int thread_type);
     void onCallComplete(int thread_type);
     void onCallDB(int db,int thread_type);
+    void onCallPcmToAAc(void* data, int size,int thread_type);
 };
 
 

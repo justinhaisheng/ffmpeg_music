@@ -53,6 +53,7 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
         if (buffer_size > 0) {
             //SLresult result;
             // enqueue another buffer
+            audio->calljava->onCallPcmToAAc(audio->sampleBuffer,buffer_size,CHILD_THREAD);
             audio->calljava->onCallDB(audio->getPCMDB(
                     reinterpret_cast<uint8_t *>(audio->sampleBuffer), buffer_size), CHILD_THREAD);
             (*audio->pcmBufferQueue)->Enqueue(audio->pcmBufferQueue, (char *)audio->sampleBuffer,buffer_size);
@@ -535,5 +536,9 @@ int HsAudio::getPCMDB(uint8_t *pcmData, size_t pcmSize) {
         db = (int)20.0 *log10(sum);
     }
     return db;
+}
+
+int HsAudio::get_samplerate() {
+    return sample_rate;
 }
 

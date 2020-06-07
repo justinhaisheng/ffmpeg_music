@@ -165,6 +165,15 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1speed
 }
 
 extern "C"
+JNIEXPORT jint JNICALL Java_com_aispeech_player_HsPlay_n_1samplerate
+        (JNIEnv *, jobject){
+    if (ffmpeg){
+        return ffmpeg->get_samplerate();
+    }
+    return -1;
+}
+
+extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){
     jint result = -1;
     javaVM = vm;

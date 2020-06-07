@@ -23,6 +23,7 @@ HsCalljava::HsCalljava(_JavaVM *javaVM, JNIEnv *env, jobject obj) {
 
     jmid_complete = env->GetMethodID(jclz,"onCallComplete","()V");
     jmid_db = env->GetMethodID(jclz,"onCallValumeDB","(I)V");
+    jmid_pcm_to_aac = env -> GetMethodID(jclz,"encodecPcmToAAc","([BI)V");
 }
 
 HsCalljava::~HsCalljava() {
@@ -197,6 +198,40 @@ void HsCalljava::onCallDB(int db, int thread_type) {
             return;
         }
         jniEnv2->CallVoidMethod(this->jobj,this->jmid_db,db);
+        this->javaVm->DetachCurrentThread();
+    }
+}
+
+void HsCalljava::onCallPcmToAAc(void* data, int size,int thread_type){
+    if (!jmid_pcm_to_aac){
+        if (LOG_DEBUG){
+            LOGE("jmid_pcm_to_aac is null");
+        }
+        return;
+    }
+    if (thread_type == MAIN_THREAD){
+        if (LOG_DEBUG){
+            LOGD("onCallPcmToAAc MAIN_THREAD");
+        }
+        jbyteArray jbuffer = jniEnv->NewByteArray(size);
+        jniEnv->SetByteArrayRegion(jbuffer, 0, size, static_cast<const jbyte *>(data));
+        this->jniEnv->CallVoidMethod(this->jobj,this->jmid_pcm_to_aac,jbuffer,size);
+        jniEnv->DeleteLocalRef(jbuffer);
+    }else{
+        if (LOG_DEBUG){
+            LOGD("onCallPcmToAAc CHILD_THREAD");
+        }
+        JNIEnv *jniEnv2;
+        if (this->javaVm->AttachCurrentThread(&jniEnv2,0)!=JNI_OK){
+            if (LOG_DEBUG){
+                LOGE("get child thread jnienv worng");
+            }
+            return;
+        }
+        jbyteArray jbuffer = jniEnv2->NewByteArray(size);
+        jniEnv2->SetByteArrayRegion(jbuffer, 0, size, static_cast<const jbyte *>(data));
+        jniEnv2->CallVoidMethod(this->jobj,this->jmid_pcm_to_aac,jbuffer,size);
+        jniEnv2->DeleteLocalRef(jbuffer);
         this->javaVm->DetachCurrentThread();
     }
 }

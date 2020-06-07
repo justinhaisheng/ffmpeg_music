@@ -87,6 +87,14 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1pitch
 JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1speed
   (JNIEnv *, jobject, jfloat);
 
+/*
+ * Class:     com_aispeech_player_HsPlay
+ * Method:    n_samplerate
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_aispeech_player_HsPlay_n_1samplerate
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

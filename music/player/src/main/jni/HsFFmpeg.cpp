@@ -331,3 +331,10 @@ void HsFFmpeg::setSpeed(float speed) {
         audio->setSpeed(speed);
     }
 }
+
+int HsFFmpeg::get_samplerate() {
+    if (audio){
+        return audio->get_samplerate();
+    }
+    return -1;
+}

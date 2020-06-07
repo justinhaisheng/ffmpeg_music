@@ -21,6 +21,9 @@ import com.aispeech.music.R;
 import com.aispeech.player.HsPlay;
 import com.aispeech.player.MuteEnum;
 
+import java.io.File;
+import java.io.IOException;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MusicActivity extends AppCompatActivity {
@@ -99,7 +102,7 @@ public class MusicActivity extends AppCompatActivity {
         mHsPlay.setHsValumeDBListener(new HsValumeDBListener() {
             @Override
             public void onDbValue(int db) {
-                Log.w(HsPlay.TAG,"onDbValue db"+db);
+                //Log.w(HsPlay.TAG,"onDbValue db"+db);
             }
         });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3
@@ -151,6 +154,7 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     public void begin(View view) {
+        //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3
         mHsPlay.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
         mHsPlay.prepare();
     }
@@ -170,6 +174,21 @@ public class MusicActivity extends AppCompatActivity {
     public void next(View view){
         mHsPlay.setNextSource("http://ngcdn004.cnr.cn/live/dszs/index.m3u8");
         mHsPlay.stop();
+    }
+
+    public void start_record(View view) {
+        String recordFile = "/sdcard/textplayer.aac";
+        File file = new File(recordFile);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(HsPlay.TAG,"create 失败");
+                return;
+            }
+        }
+        mHsPlay.startRecord(file);
     }
 
     Handler handler = new Handler(){
