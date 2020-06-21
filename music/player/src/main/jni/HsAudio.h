@@ -64,6 +64,8 @@ public:
     uint8_t* sound_out_buffer = NULL;
     bool sound_finished = true;
 
+    //是否录制
+    bool record = false;
 public:
     HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters *codecpar,int streamIndex);
     ~HsAudio();
@@ -83,6 +85,7 @@ public:
     void setSpeed(float speed);
     int getPCMDB(uint8_t* pcmData,size_t pcmSize);
     int get_samplerate();
+    void startstoprecord(bool record);
 };
 
 

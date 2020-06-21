@@ -174,6 +174,14 @@ JNIEXPORT jint JNICALL Java_com_aispeech_player_HsPlay_n_1samplerate
 }
 
 extern "C"
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1startstoprecord
+        (JNIEnv *, jobject, jboolean record){
+    if (ffmpeg){
+        ffmpeg->startstoprecord(record);
+    }
+}
+
+extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){
     jint result = -1;
     javaVM = vm;

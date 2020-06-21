@@ -31,6 +31,7 @@ HsAudio::~HsAudio() {
     delete soundTouch;
     soundTouch = NULL;
     sound_out_buffer = NULL;
+    record = false;
 }
 
 void* decode_play(void* data){
@@ -53,7 +54,10 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
         if (buffer_size > 0) {
             //SLresult result;
             // enqueue another buffer
-            audio->calljava->onCallPcmToAAc(audio->sampleBuffer,buffer_size,CHILD_THREAD);
+            if (audio->record){//判断是否要录制
+                audio->calljava->onCallPcmToAAc(audio->sampleBuffer,buffer_size,CHILD_THREAD);
+            }
+
             audio->calljava->onCallDB(audio->getPCMDB(
                     reinterpret_cast<uint8_t *>(audio->sampleBuffer), buffer_size), CHILD_THREAD);
             (*audio->pcmBufferQueue)->Enqueue(audio->pcmBufferQueue, (char *)audio->sampleBuffer,buffer_size);
@@ -540,5 +544,9 @@ int HsAudio::getPCMDB(uint8_t *pcmData, size_t pcmSize) {
 
 int HsAudio::get_samplerate() {
     return sample_rate;
+}
+
+void HsAudio::startstoprecord(bool record) {
+    this->record = record;
 }
 

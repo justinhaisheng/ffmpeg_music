@@ -154,6 +154,7 @@ public class HsPlay {
     public void stop() {
         onCallTimeInfo(0, 0);
         hsTimeInfoBean = null;
+        stopRecord();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -199,11 +200,48 @@ public class HsPlay {
         return 0;
     }
 
-    public void startRecord(File outfile)
-    {
+    //开始录制
+    private boolean initmediacodec = false;
+    public void startRecord(File outfile) {
+        if (initmediacodec)
+            return;
         int sampleSate = n_samplerate();
         if(sampleSate > 0) {
+            initmediacodec = true;
+            n_startstoprecord(true);
             initMediaCodec(sampleSate, outfile);
+        }
+    }
+
+    //停止录制
+    public void stopRecord(){
+        if (!initmediacodec)
+            return;
+        n_startstoprecord(false);
+        releaseMediaCodec();
+        initmediacodec = false;
+    }
+
+    public void pauseRecord() {
+        n_startstoprecord(false);
+    }
+
+    public void resumeRcord() {
+        n_startstoprecord(true);
+    }
+
+    private void releaseMediaCodec() {
+        if (mAudioEncoder == null)
+            return;
+        mAudioEncoder.stop();
+        mAudioEncoder = null;
+        mAudioFormat = null;
+        if (mOutputStream!=null){
+            try {
+                mOutputStream.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -286,6 +324,7 @@ public class HsPlay {
 
     private native int n_samplerate();
 
+    private native void n_startstoprecord(boolean record);
 
     //mediacodec
     private MediaCodec mAudioEncoder;
@@ -316,6 +355,13 @@ public class HsPlay {
             e.printStackTrace();
             Log.e(TAG, "create audio encoder failure e" + e.getMessage());
             mAudioEncoder = null;
+            if (mOutputStream!=null){
+                try {
+                    mOutputStream.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 

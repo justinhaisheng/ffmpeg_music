@@ -338,3 +338,9 @@ int HsFFmpeg::get_samplerate() {
     }
     return -1;
 }
+
+void HsFFmpeg::startstoprecord(bool reord) {
+    if (audio){
+        audio->startstoprecord(reord);
+    }
+}

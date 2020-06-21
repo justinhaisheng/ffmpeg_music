@@ -191,6 +191,18 @@ public class MusicActivity extends AppCompatActivity {
         mHsPlay.startRecord(file);
     }
 
+    public void pause_record(View view) {
+        mHsPlay.pauseRecord();
+    }
+
+    public void goon_record(View view) {
+        mHsPlay.resumeRcord();
+    }
+
+    public void stop_record(View view) {
+        mHsPlay.stopRecord();
+    }
+
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {

@@ -95,6 +95,14 @@ JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1speed
 JNIEXPORT jint JNICALL Java_com_aispeech_player_HsPlay_n_1samplerate
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_aispeech_player_HsPlay
+ * Method:    n_startstoprecord
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL Java_com_aispeech_player_HsPlay_n_1startstoprecord
+  (JNIEnv *, jobject, jboolean);
+
 #ifdef __cplusplus
 }
 #endif

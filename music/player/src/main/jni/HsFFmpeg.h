@@ -46,6 +46,8 @@ public:
     void setSpeed(float speed);
 
     int get_samplerate();
+
+    void startstoprecord(bool reord);
 };
 
 
