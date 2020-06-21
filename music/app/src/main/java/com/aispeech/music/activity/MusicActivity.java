@@ -14,6 +14,7 @@ import com.aispeech.HsTimeInfoBean;
 import com.aispeech.listener.HsCompleteListener;
 import com.aispeech.listener.HsErrorListener;
 import com.aispeech.listener.HsLoadingListener;
+import com.aispeech.listener.HsOnRecordTimeListener;
 import com.aispeech.listener.HsOnTimeInfoListener;
 import com.aispeech.listener.HsPrepareListener;
 import com.aispeech.listener.HsValumeDBListener;
@@ -103,6 +104,12 @@ public class MusicActivity extends AppCompatActivity {
             @Override
             public void onDbValue(int db) {
                 //Log.w(HsPlay.TAG,"onDbValue db"+db);
+            }
+        });
+        mHsPlay.setHsOnRecordTimeListener(new HsOnRecordTimeListener() {
+            @Override
+            public void onRecordTime(int recordTime) {
+                Log.w(HsPlay.TAG,"recordTime "+recordTime);
             }
         });
         //http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3

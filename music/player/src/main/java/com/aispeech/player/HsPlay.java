@@ -10,6 +10,7 @@ import com.aispeech.HsTimeInfoBean;
 import com.aispeech.listener.HsCompleteListener;
 import com.aispeech.listener.HsErrorListener;
 import com.aispeech.listener.HsLoadingListener;
+import com.aispeech.listener.HsOnRecordTimeListener;
 import com.aispeech.listener.HsOnTimeInfoListener;
 import com.aispeech.listener.HsPrepareListener;
 import com.aispeech.listener.HsValumeDBListener;
@@ -42,6 +43,7 @@ public class HsPlay {
 
     private String mSource;//数据源
     private boolean mNextSource = false;//下一个数据源
+    private int mSampleSate;
 
     public void setSource(String source) {
         this.mSource = source;
@@ -97,6 +99,10 @@ public class HsPlay {
         this.mHsValumeDBListener = hsValumeDBListener;
     }
 
+    HsOnRecordTimeListener mHsOnRecordTimeListener;
+    public void setHsOnRecordTimeListener(HsOnRecordTimeListener hsOnRecordTimeListener) {
+        this.mHsOnRecordTimeListener = hsOnRecordTimeListener;
+    }
 
     public void prepare() {
         if (TextUtils.isEmpty(mSource)) {
@@ -205,11 +211,11 @@ public class HsPlay {
     public void startRecord(File outfile) {
         if (initmediacodec)
             return;
-        int sampleSate = n_samplerate();
-        if(sampleSate > 0) {
+        mSampleSate = n_samplerate();
+        if(mSampleSate > 0) {
             initmediacodec = true;
             n_startstoprecord(true);
-            initMediaCodec(sampleSate, outfile);
+            initMediaCodec(mSampleSate, outfile);
         }
     }
 
@@ -233,6 +239,7 @@ public class HsPlay {
     private void releaseMediaCodec() {
         if (mAudioEncoder == null)
             return;
+        recordTime = 0;
         mAudioEncoder.stop();
         mAudioEncoder = null;
         mAudioFormat = null;
@@ -243,6 +250,7 @@ public class HsPlay {
                 ex.printStackTrace();
             }
         }
+        mSampleSate = 0;
     }
 
 
@@ -342,6 +350,7 @@ public class HsPlay {
                 Log.e(TAG, "create audio encoder failure");
                 return;
             }
+            recordTime = 0;
             mAacSamperate = getADTSsamplerate(samperate);
             mAudioFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, samperate, 2);
             mAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, 96000);//码率
@@ -365,10 +374,16 @@ public class HsPlay {
         }
     }
 
+    private double recordTime = 0;
     private void encodecPcmToAAc(byte[] data, int size) {
         if (mAudioEncoder == null) return;
         if (data == null) return;
-        Log.d(TAG, "encodecPcmToAAc() size:"+size+" "+data.length);
+
+        recordTime += size * 1.0 / (mSampleSate * 2 * (16 / 8));//录制时长
+        Log.d(TAG, "recordTime:"+recordTime);
+        if(mHsOnRecordTimeListener != null) {
+            mHsOnRecordTimeListener.onRecordTime((int) recordTime);
+        }
         int inputIndex = mAudioEncoder.dequeueInputBuffer(0);//获取输入队列的可使用index
         if (inputIndex >= 0) {
             ByteBuffer inputBuffer = mAudioEncoder.getInputBuffers()[inputIndex];
