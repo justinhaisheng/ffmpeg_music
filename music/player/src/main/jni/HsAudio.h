@@ -66,6 +66,7 @@ public:
 
     //是否录制
     bool record = false;
+    bool db_call = false;//是否返回db分贝数
 public:
     HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters *codecpar,int streamIndex);
     ~HsAudio();
@@ -86,6 +87,7 @@ public:
     int getPCMDB(uint8_t* pcmData,size_t pcmSize);
     int get_samplerate();
     void startstoprecord(bool record);
+    void dbCall(bool db_call);
 };
 
 

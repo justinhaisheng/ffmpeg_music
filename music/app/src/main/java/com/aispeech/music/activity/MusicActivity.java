@@ -103,7 +103,7 @@ public class MusicActivity extends AppCompatActivity {
         mHsPlay.setHsValumeDBListener(new HsValumeDBListener() {
             @Override
             public void onDbValue(int db) {
-                //Log.w(HsPlay.TAG,"onDbValue db"+db);
+                Log.w(HsPlay.TAG,"onDbValue db"+db);
             }
         });
         mHsPlay.setHsOnRecordTimeListener(new HsOnRecordTimeListener() {
@@ -264,5 +264,15 @@ public class MusicActivity extends AppCompatActivity {
     public void normalspeedpitch(View view) {
         mHsPlay.setSpeed(1.0f);
         mHsPlay.setPitch(1.0f);
+    }
+
+    boolean db = false;
+    public void dbCall(View view){
+        if (db){
+            db = false;
+        }else{
+            db = true;
+        }
+        mHsPlay.dbCall(db);
     }
 }

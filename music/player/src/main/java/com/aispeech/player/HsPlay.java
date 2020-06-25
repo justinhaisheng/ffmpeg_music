@@ -236,6 +236,10 @@ public class HsPlay {
         n_startstoprecord(true);
     }
 
+    public void dbCall(boolean dbcall){
+        n_dbCall(dbcall);
+    }
+
     private void releaseMediaCodec() {
         if (mAudioEncoder == null)
             return;
@@ -333,6 +337,8 @@ public class HsPlay {
     private native int n_samplerate();
 
     private native void n_startstoprecord(boolean record);
+
+    private native void n_dbCall(boolean dbCall);
 
     //mediacodec
     private MediaCodec mAudioEncoder;

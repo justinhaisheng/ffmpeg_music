@@ -32,6 +32,7 @@ HsAudio::~HsAudio() {
     soundTouch = NULL;
     sound_out_buffer = NULL;
     record = false;
+    db_call = false;
 }
 
 void* decode_play(void* data){
@@ -57,9 +58,11 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
             if (audio->record){//判断是否要录制
                 audio->calljava->onCallPcmToAAc(audio->sampleBuffer,buffer_size,CHILD_THREAD);
             }
+            if (audio->db_call){
+                audio->calljava->onCallDB(audio->getPCMDB(
+                        reinterpret_cast<uint8_t *>(audio->sampleBuffer), buffer_size), CHILD_THREAD);
+            }
 
-            audio->calljava->onCallDB(audio->getPCMDB(
-                    reinterpret_cast<uint8_t *>(audio->sampleBuffer), buffer_size), CHILD_THREAD);
             (*audio->pcmBufferQueue)->Enqueue(audio->pcmBufferQueue, (char *)audio->sampleBuffer,buffer_size);
             LOGE("Enqueue %d",buffer_size);
             // the most likely other result is SL_RESULT_BUFFER_INSUFFICIENT,
@@ -548,5 +551,9 @@ int HsAudio::get_samplerate() {
 
 void HsAudio::startstoprecord(bool record) {
     this->record = record;
+}
+
+void HsAudio::dbCall(bool db_call) {
+    this->db_call = db_call;
 }
 

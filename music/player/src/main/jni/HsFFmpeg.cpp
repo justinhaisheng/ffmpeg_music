@@ -344,3 +344,9 @@ void HsFFmpeg::startstoprecord(bool reord) {
         audio->startstoprecord(reord);
     }
 }
+
+void HsFFmpeg::dbCall(bool db_call) {
+    if (audio){
+       audio->dbCall(db_call);
+    }
+}

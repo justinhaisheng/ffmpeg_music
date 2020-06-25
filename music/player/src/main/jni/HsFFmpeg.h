@@ -48,6 +48,7 @@ public:
     int get_samplerate();
 
     void startstoprecord(bool reord);
+    void dbCall(bool db_call);
 };
 
 

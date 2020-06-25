@@ -129,6 +129,13 @@
             android:text="正常播放"
             android:onClick="normalspeedpitch"/>
     </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="是否callBd"
+        android:onClick="dbCall">
+    </Button>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
