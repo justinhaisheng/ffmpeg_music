@@ -67,6 +67,7 @@ public:
     //是否录制
     bool record = false;
     bool db_call = false;//是否返回db分贝数
+    bool read_frame_finished = true;//是否把avpacket解码完，解码成av_frame,.ape音乐解码出来的AVPacket里面包含多个AVFrame,默认是解码完成
 public:
     HsAudio(HsPlaystatus* playstatus,HsCalljava* calljava,AVCodecParameters *codecpar,int streamIndex);
     ~HsAudio();

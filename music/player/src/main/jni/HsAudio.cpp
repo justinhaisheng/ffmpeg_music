@@ -33,6 +33,7 @@ HsAudio::~HsAudio() {
     sound_out_buffer = NULL;
     record = false;
     db_call = false;
+    read_frame_finished = true;
 }
 
 void* decode_play(void* data){
@@ -168,28 +169,32 @@ int HsAudio::resampleAudio() {
             }
         }
 
-
-        AVPacket* avPacket = av_packet_alloc();
-        if(this->queue->getPacket(avPacket)!=0){
-            if (LOG_DEBUG){
-                LOGE("queue->getPacket!=0");
-            }
-            av_packet_free(&avPacket);
-            av_free(avPacket);
-            avPacket = NULL;
-            continue ;
-        }
         int ret = -1;
-        ret = avcodec_send_packet(this->avCodecContext,avPacket);//送入编码器进行编码
-        if (ret != 0 ){
-            if (LOG_DEBUG){
-                LOGE("avcodec_send_packet!=0");
+        AVPacket* avPacket = NULL;
+        if(read_frame_finished){//默认进行解码
+            avPacket = av_packet_alloc();
+            if(this->queue->getPacket(avPacket)!=0){
+                if (LOG_DEBUG){
+                    LOGE("queue->getPacket!=0");
+                }
+                av_packet_free(&avPacket);
+                av_free(avPacket);
+                avPacket = NULL;
+                continue ;
             }
-            av_packet_free(&avPacket);
-            av_free(avPacket);
-            avPacket = NULL;
-            continue ;
+
+            ret = avcodec_send_packet(this->avCodecContext,avPacket);//送入编码器进行编码
+            if (ret != 0 ){
+                if (LOG_DEBUG){
+                    LOGE("avcodec_send_packet!=0");
+                }
+                av_packet_free(&avPacket);
+                av_free(avPacket);
+                avPacket = NULL;
+                continue ;
+            }
         }
+
         AVFrame* avFrame = av_frame_alloc();
         ret = avcodec_receive_frame(this->avCodecContext,avFrame);//获取解码后的帧数据
         if (ret != 0 ){
@@ -203,9 +208,11 @@ int HsAudio::resampleAudio() {
             av_frame_free(&avFrame);
             av_free(avFrame);
             avFrame = NULL;
+
+            read_frame_finished = true;
             continue ;
         }
-
+        read_frame_finished = false;
         //重采样
         if(avFrame->channels > 0 && avFrame->channel_layout == 0){
             //重新设置声道布局
@@ -248,6 +255,8 @@ int HsAudio::resampleAudio() {
             if(swr_ctx){
                 swr_free(&swr_ctx);
             }
+
+            read_frame_finished = true;
             continue ;
         }
 //        swr_convert(struct SwrContext *s, uint8_t **out, int out_count,
