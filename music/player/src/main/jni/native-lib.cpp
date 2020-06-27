@@ -191,6 +191,16 @@ Java_com_aispeech_player_HsPlay_n_1dbCall(JNIEnv *env, jobject thiz, jboolean db
 }
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_com_aispeech_player_HsPlay_n_1maxinputsize(JNIEnv *env, jobject thiz, jint max_input_size) {
+    // TODO: implement n_maxinputsize()
+    if (ffmpeg){
+        ffmpeg->max_input_size(max_input_size);
+    }
+}
+
+
+extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved){
     jint result = -1;
     javaVM = vm;

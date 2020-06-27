@@ -8,6 +8,7 @@
 #include "HsPlaystatus.h"
 #include "HsQueue.h"
 #include "HsCalljava.h"
+#include "HsBufferQueue.h"
 
 extern "C"
 {
@@ -63,9 +64,15 @@ public:
     SAMPLETYPE* sampleBuffer = NULL;
     uint8_t* sound_out_buffer = NULL;
     bool sound_finished = true;
+    pthread_t thread_call_pcm;
+    HsBufferQueue* pcmQueue =NULL;
 
     //是否录制
     bool record = false;
+    //
+    int record_max_size = 0;
+
+
     bool db_call = false;//是否返回db分贝数
     bool read_frame_finished = true;//是否把avpacket解码完，解码成av_frame,.ape音乐解码出来的AVPacket里面包含多个AVFrame,默认是解码完成
 public:
@@ -89,6 +96,7 @@ public:
     int get_samplerate();
     void startstoprecord(bool record);
     void dbCall(bool db_call);
+    void max_input_size(int size);
 };
 
 

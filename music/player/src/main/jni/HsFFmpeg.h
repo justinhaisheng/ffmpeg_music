@@ -49,6 +49,7 @@ public:
 
     void startstoprecord(bool reord);
     void dbCall(bool db_call);
+    void max_input_size(int size);
 };
 
 

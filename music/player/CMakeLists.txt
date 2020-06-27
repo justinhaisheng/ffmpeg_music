@@ -26,6 +26,8 @@ add_library( # Sets the name of the library.
         src/main/jni/HsAudio.cpp
         src/main/jni/HsPlaystatus.cpp
         src/main/jni/HsQueue.cpp
+        src/main/jni/HsPcmBean.cpp
+        src/main/jni/HsBufferQueue.cpp
 
         src/main/jni/SoundTouch/AAFilter.cpp
         src/main/jni/SoundTouch/FIFOSampleBuffer.cpp

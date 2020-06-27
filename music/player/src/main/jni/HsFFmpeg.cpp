@@ -175,7 +175,7 @@ void HsFFmpeg::startFFmpegThread() {
         if(audio->queue->getQueueSize() > 40)//防止已经被解码完成，seek的时候会清空队列数据。
         {
             if(LOG_DEBUG){
-                LOGD("队列已满40 ...");
+               // LOGD("队列已满40 ...");
             }
             continue;
         }
@@ -349,5 +349,11 @@ void HsFFmpeg::startstoprecord(bool reord) {
 void HsFFmpeg::dbCall(bool db_call) {
     if (audio){
        audio->dbCall(db_call);
+    }
+}
+
+void HsFFmpeg::max_input_size(int size) {
+    if (audio){
+        audio->max_input_size(size);
     }
 }

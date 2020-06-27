@@ -42,8 +42,57 @@ void* decode_play(void* data){
     pthread_exit(&audio->thread_play);
 }
 
+void* call_pcm(void* data){
+    HsAudio* audio = static_cast<HsAudio *>(data);
+    while(audio->playstatus && !audio->playstatus->exit){
+        if(audio->pcmQueue){
+            HsPcmBean *pcmBean =NULL;
+            audio->pcmQueue->getBuffer(&pcmBean);
+            if(!pcmBean){
+                continue;
+            }
+            LOGD("pcmbean buffer size is %d", pcmBean->buffsize);
+            if(pcmBean->buffsize <= audio->record_max_size){//不需要分包
+                if(audio->record){
+                    audio->calljava->onCallPcmToAAc(pcmBean->buffer,pcmBean->buffsize,CHILD_THREAD);
+                }
+            }else{//分包
+                if (audio->record){
+                    LOGI("分包的数据大小1 is %d", audio->record_max_size);
+                    int pack_num = pcmBean->buffsize / audio->record_max_size;
+                    int pack_sub = pcmBean->buffsize % audio->record_max_size;
+                    for (int i = 0; i < pack_num; ++i) {
+                        uint8_t *bf = static_cast<uint8_t *>(malloc(
+                                sizeof(uint8_t) * audio->record_max_size));
+                        memcpy(bf, pcmBean->buffer + i * audio->record_max_size, audio->record_max_size);
+
+                        audio->calljava->onCallPcmToAAc(bf,audio->record_max_size,CHILD_THREAD);
+
+                        free(bf);
+                        bf = NULL;
+                    }
+
+                    if(pack_sub>0){//还有剩余的
+                        uint8_t *bf = static_cast<uint8_t *>(malloc(
+                                sizeof(uint8_t) * pack_sub));
+                        LOGI("分包的数据大小1 is %d", pack_sub);
+                        memcpy(bf, pcmBean->buffer + pack_num * audio->record_max_size, pack_sub);
+
+                        audio->calljava->onCallPcmToAAc(bf,pack_sub,CHILD_THREAD);
+
+                        free(bf);
+                        bf = NULL;
+                    }
+                }
+            }
+        }
+    }
+    pthread_exit(&audio->thread_call_pcm);
+}
+
 void HsAudio::play() {
     pthread_create(&thread_play,NULL,decode_play,this);
+    pthread_create(&thread_call_pcm,NULL,call_pcm,this);
 }
 
 void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
@@ -57,7 +106,10 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void* context)
             //SLresult result;
             // enqueue another buffer
             if (audio->record){//判断是否要录制
-                audio->calljava->onCallPcmToAAc(audio->sampleBuffer,buffer_size,CHILD_THREAD);
+                if(audio->pcmQueue){
+                    audio->pcmQueue->putBuffer(audio->sampleBuffer,buffer_size);
+                }
+               // audio->calljava->onCallPcmToAAc(audio->sampleBuffer,buffer_size,CHILD_THREAD);
             }
             if (audio->db_call){
                 audio->calljava->onCallDB(audio->getPCMDB(
@@ -368,6 +420,16 @@ void HsAudio::stop() {
 
 void HsAudio::release() {
     stop();
+
+    if(pcmQueue != NULL)
+    {
+        pcmQueue->noticeThread();
+        pthread_join(thread_call_pcm, NULL);
+        pcmQueue->release();
+        delete(pcmQueue);
+        pcmQueue = NULL;
+    }
+
     if (queue){
         delete queue;
         queue = NULL;
@@ -564,5 +626,11 @@ void HsAudio::startstoprecord(bool record) {
 
 void HsAudio::dbCall(bool db_call) {
     this->db_call = db_call;
+}
+
+void HsAudio::max_input_size(int size){
+    this->record_max_size = size;
+    //创建使用pcmQueue的队列
+    pcmQueue = new HsBufferQueue(this->playstatus);
 }
 

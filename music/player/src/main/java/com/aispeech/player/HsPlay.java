@@ -216,6 +216,7 @@ public class HsPlay {
             initmediacodec = true;
             n_startstoprecord(true);
             initMediaCodec(mSampleSate, outfile);
+            n_maxinputsize(MAX_INPUT_SIZE);
         }
     }
 
@@ -340,13 +341,15 @@ public class HsPlay {
 
     private native void n_dbCall(boolean dbCall);
 
+    private native void n_maxinputsize(int maxInputSize);
+
     //mediacodec
     private MediaCodec mAudioEncoder;
     private MediaFormat mAudioFormat;
     private MediaCodec.BufferInfo mBufferInfo;
     private FileOutputStream mOutputStream;
     private int mAacSamperate = 0;
-
+    public static int MAX_INPUT_SIZE = 4096;
     //初始化编码器
     private void initMediaCodec(int samperate, File outfile) {
         try {
@@ -361,7 +364,7 @@ public class HsPlay {
             mAudioFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, samperate, 2);
             mAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, 96000);//码率
             mAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-            mAudioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 10240);
+            mAudioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, MAX_INPUT_SIZE);
             mAudioEncoder.configure(mAudioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mBufferInfo = new MediaCodec.BufferInfo();//编码后的信息，preTime
             mOutputStream = new FileOutputStream(outfile);
@@ -383,7 +386,10 @@ public class HsPlay {
     private double recordTime = 0;
     private void encodecPcmToAAc(byte[] data, int size) {
         if (mAudioEncoder == null) return;
-        if (data == null) return;
+        if (data == null) {
+            releaseMediaCodec();
+            return;
+        }
 
         recordTime += size * 1.0 / (mSampleSate * 2 * (16 / 8));//录制时长
         Log.d(TAG, "recordTime:"+recordTime);
@@ -399,6 +405,7 @@ public class HsPlay {
             inputBuffer.put(data);
             mAudioEncoder.queueInputBuffer(inputIndex, 0, size, 0, 0);//输入到队列
         }else{
+
             Log.e(TAG, "encodecPcmToAAc inputIndex<0");
             return;
         }
@@ -423,6 +430,7 @@ public class HsPlay {
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e(TAG, "encodecPcmToAAc() e:"+e.getMessage());
+                releaseMediaCodec();
                 continue;
             }
 
